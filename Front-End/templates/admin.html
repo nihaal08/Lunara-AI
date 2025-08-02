@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - Lunara{% endblock %}
+{% block hero %}
+<div class="hero">
+    <h1>Admin Dashboard</h1>
+    <p>Manage users and predictions.</p>
+</div>
+{% endblock %}
+{% block content %}
+<div id="admin">
+    <h2 class="dashboard-title">Dashboard Overview</h2>
+    <div class="dashboard">
+        <div class="card">
+            <h2>Prediction Statistics</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model Type</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in model_counts %}
+                    <tr>
+                        <td>{{ stat[0] }}</td>
+                        <td>{{ stat[1] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Users</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Is Admin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[2] }}</td>
+                    <td>{{ user[3] }}</td>
+                    <td>{{ 'Yes' if user[5] else 'No' }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_user', user_id=user[0]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ user[1] }}?');">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Prediction History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Model Type</th>
+                    <th>Inputs</th>
+                    <th>Prediction</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prediction in predictions %}
+                <tr>
+                    <td>{{ prediction[0] }}</td>
+                    <td>{{ prediction[6] if prediction[6] else 'Unknown' }}</td>
+                    <td>{{ prediction[2] }}</td>
+                    <td>{{ prediction[3] }}</td>
+                    <td>{{ prediction[4] }}</td>
+                    <td>{{ prediction[5] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.dashboard-title {
+    text-align: center;
+    color: #2A6F7F; /* Matches updated theme */
+    margin-bottom: 2rem;
+}
+
+.delete-btn {
+    background-color: #D9534F; /* Red for delete action */
+    color: #FFFFFF;
+    padding: 0.3rem 0.6rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #C9302C; /* Darker red on hover */
+}
+</style>
+{% endblock %}

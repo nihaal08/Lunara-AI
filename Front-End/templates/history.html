@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Prediction History - Lunara{% endblock %}
+{% block hero %}
+<div class="hero">
+    <h1>Your Prediction History</h1>
+    <p>View all your past maternal health predictions.</p>
+</div>
+{% endblock %}
+{% block content %}
+{% if predictions is none %}
+    <div class="card">
+        <h2>Prediction History</h2>
+        <p>Please log in to view your prediction history.</p>
+    </div>
+{% else %}
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <form method="POST" action="{{ url_for('download_history_pdf') }}" style="display: inline;">
+            <button type="submit" class="history-btn download-btn">Download History as PDF</button>
+        </form>
+        <form method="POST" action="{{ url_for('clear_history') }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to clear your prediction history? This action cannot be undone.');">
+            <button type="submit" class="history-btn clear-btn">Clear History</button>
+        </form>
+    </div>
+    {% if predictions %}
+        {% for prediction in predictions %}
+            <div class="card">
+                <h2>{{ prediction.model_type }} Prediction</h2>
+                <p><strong>Prediction:</strong> {{ prediction.prediction }}</p>
+                <p><strong>Timestamp:</strong> {{ prediction.timestamp }}</p>
+                <p><strong>Inputs:</strong></p>
+                <ul>
+                    {% for key, value in prediction.inputs.items() %}
+                        <li>{{ key.replace('_', ' ') }}: {{ value }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Clinical Interpretation:</strong> 
+                    {% if prediction.model_type == "Gestational Diabetes" %}
+                        {{ "This indicates a risk for gestational diabetes. Immediate consultation with an obstetrician is recommended." if prediction.prediction == "GDM" else "This indicates no immediate concern for gestational diabetes. Continue regular monitoring." }}
+                    {% elif prediction.model_type == "Maternal Health" %}
+                        {{ "This indicates a high-risk pregnancy requiring immediate medical attention." if prediction.prediction == "high risk" else "This indicates a moderate risk level; consult a healthcare provider." if prediction.prediction == "mid risk" else "This indicates a low risk level, but regular check-ups are recommended." }}
+                    {% else %}
+                        {{ "This indicates a high risk of preeclampsia. Immediate medical consultation is advised." if prediction.prediction == "high" else "This indicates a moderate risk level; consult a healthcare provider." if prediction.prediction == "mid" else "This indicates a low risk level, but regular monitoring is recommended." }}
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="card">
+            <h2>Prediction History</h2>
+            <p>No predictions found.</p>
+        </div>
+    {% endif %}
+{% endif %}
+
+<style>
+.history-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 0.5rem;
+}
+
+.download-btn {
+    background-color: #F5A7A6;
+    color: #FFFFFF;
+}
+
+.download-btn:hover {
+    background-color: #E59695;
+}
+
+.clear-btn {
+    background-color: #FF4D4D;
+    color: #FFFFFF;
+}
+
+.clear-btn:hover {
+    background-color: #E04343;
+}
+</style>
+
+<script>
+    // Check if the URL has the 'cleared=true' query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('cleared') === 'true') {
+        alert('Prediction history cleared successfully!');
+        // Optionally, clean up the URL to prevent repeated alerts on refresh
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+</script>
+{% endblock %}

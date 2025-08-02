@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block title %}Preeclampsia Prediction - Lunara{% endblock %}
+{% block hero %}
+<div class="hero">
+    <h1>Preeclampsia Prediction</h1>
+    <p>Enter the required details to predict the risk of preeclampsia during pregnancy.</p>
+</div>
+{% endblock %}
+{% block content %}
+<div class="form-container">
+    <form method="POST" class="prediction-form">
+        <!-- Pregnancy Info Section -->
+        <div class="form-section">
+            <h3>Pregnancy Info</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="gravida">
+                        Gravida
+                        <span class="info-btn">ⓘ<span class="tooltip">The total number of pregnancies, including the current one. Helps assess pregnancy history and risk factors.</span></span>
+                    </label>
+                    <input type="number" id="gravida" name="gravida" required placeholder="e.g., 2">
+                </div>
+                <div class="form-group">
+                    <label for="parity">
+                        Parity
+                        <span class="info-btn">ⓘ<span class="tooltip">The number of times you’ve given birth to a fetus with a gestational age of 20 weeks or more. Indicates prior delivery experience.</span></span>
+                    </label>
+                    <input type="number" id="parity" name="parity" required placeholder="e.g., 1">
+                </div>
+                <div class="form-group">
+                    <label for="gestational_age">
+                        Gestational Age (weeks)
+                        <span class="info-btn">ⓘ<span class="tooltip">The current age of the pregnancy in weeks. Critical for assessing preeclampsia risk at different stages.</span></span>
+                    </label>
+                    <input type="number" step="0.1" id="gestational_age" name="gestational_age" required placeholder="e.g., 28.5">
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Info Section -->
+        <div class="form-section">
+            <h3>Personal Info</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="age">
+                        Age
+                        <span class="info-btn">ⓘ<span class="tooltip">Your age in years. Advanced maternal age (over 35) can increase preeclampsia risk.</span></span>
+                    </label>
+                    <input type="number" id="age" name="age" required placeholder="e.g., 30">
+                </div>
+                <div class="form-group">
+                    <label for="bmi">
+                        BMI
+                        <span class="info-btn">ⓘ<span class="tooltip">Body Mass Index (weight in kg / height in m²). Higher BMI can be a risk factor for preeclampsia.</span></span>
+                    </label>
+                    <input type="number" step="0.1" id="bmi" name="bmi" required placeholder="e.g., 25.5">
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical History Section -->
+        <div class="form-section">
+            <h3>Medical History</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="diabetes">
+                        Diabetes
+                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have diabetes (pre-existing or gestational). Diabetes can increase the risk of preeclampsia.</span></span>
+                    </label>
+                    <select id="diabetes" name="diabetes" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="hypertension">
+                        Hypertension History
+                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have a history of high blood pressure before pregnancy. A key risk factor for preeclampsia.</span></span>
+                    </label>
+                    <select id="hypertension" name="hypertension" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clinical Measurements Section -->
+        <div class="form-section">
+            <h3>Clinical Measurements</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="systolic_bp">
+                        Systolic BP (mmHg)
+                        <span class="info-btn">ⓘ<span class="tooltip">The top number in your blood pressure reading. High systolic BP is a major indicator of preeclampsia.</span></span>
+                    </label>
+                    <input type="number" step="0.1" id="systolic_bp" name="systolic_bp" required placeholder="e.g., 120">
+                </div>
+                <div class="form-group">
+                    <label for="diastolic_bp">
+                        Diastolic BP (mmHg)
+                        <span class="info-btn">ⓘ<span class="tooltip">The bottom number in your blood pressure reading. Elevated diastolic BP can signal preeclampsia risk.</span></span>
+                    </label>
+                    <input type="number" step="0.1" id="diastolic_bp" name="diastolic_bp" required placeholder="e.g., 80">
+                </div>
+                <div class="form-group">
+                    <label for="hb">
+                        Hemoglobin (g/dL)
+                        <span class="info-btn">ⓘ<span class="tooltip">Measures the protein in red blood cells that carries oxygen. Abnormal levels can indicate health issues related to preeclampsia.</span></span>
+                    </label>
+                    <input type="number" step="0.1" id="hb" name="hb" required placeholder="e.g., 12.5">
+                </div>
+                <div class="form-group">
+                    <label for="fetal_weight">
+                        Fetal Weight (kg)
+                        <span class="info-btn">ⓘ<span class="tooltip">Estimated weight of the fetus. Abnormal fetal growth can be associated with preeclampsia.</span></span>
+                    </label>
+                    <input type="number" step="0.1" id="fetal_weight" name="fetal_weight" required placeholder="e.g., 2.5">
+                </div>
+                <div class="form-group">
+                    <label for="protein_uria">
+                        Protein Uria
+                        <span class="info-btn">ⓘ<span class="tooltip">Presence of excess protein in your urine. A key diagnostic marker for preeclampsia.</span></span>
+                    </label>
+                    <select id="protein_uria" name="protein_uria" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amniotic_fluid">
+                        Amniotic Fluid (cm)
+                        <span class="info-btn">ⓘ<span class="tooltip">The amount of fluid surrounding the fetus, measured in centimeters. Abnormal levels can indicate complications like preeclampsia.</span></span>
+                    </label>
+                    <input type="number" step="0.1" id="amniotic_fluid" name="amniotic_fluid" required placeholder="e.g., 15">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Predict</button>
+    </form>
+
+    {% if result %}
+    <div class="result-card">
+        <h3>Prediction Result</h3>
+        <p><strong>Risk Level:</strong> {{ result }}</p>
+        <p><strong>Clinical Interpretation:</strong></p>
+        <p>
+            {% if result == 'high' %}
+            This indicates a high risk of preeclampsia. Immediate medical consultation is advised.
+            {% elif result == 'mid' %}
+            This indicates a moderate risk level; consult a healthcare provider.
+            {% else %}
+            This indicates a low risk level, but regular monitoring is recommended.
+            {% endif %}
+        </p>
+        <h4>Input Values:</h4>
+        <ul>
+            {% for key, value in inputs.items() %}
+            <li>{{ key.replace('_', ' ') }}: {{ value }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.prediction-form {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+    margin-bottom: 1rem;
+}
+
+.form-section h3 {
+    color: #F5A7A6;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #F5A7A6;
+    outline: none;
+}
+
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #F5A7A6;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #E59695;
+}
+
+.result-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.result-card h3 {
+    color: #F5A7A6;
+    margin-bottom: 1rem;
+}
+
+.result-card p {
+    margin-bottom: 0.5rem;
+}
+
+.result-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.result-card li {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+/* Info Button and Tooltip Styles */
+.info-btn {
+    position: relative;
+    display: inline-block;
+    margin-left: 0.3rem;
+    color: #F5A7A6;
+    font-size: 0.8rem;
+    cursor: help;
+}
+
+.info-btn:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: -0.5rem;
+    left: 1.5rem;
+    transform: translateY(-100%);
+    background-color: #333;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    width: 200px;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #333 transparent transparent;
+}
+</style>
+{% endblock %}

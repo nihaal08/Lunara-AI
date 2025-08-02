@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Login - Lunara{% endblock %}
+{% block hero %}
+<div class="hero">
+    <h1>Welcome Back to Lunara</h1>
+    <p>Log in to access personalized maternal health predictions.</p>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h2>Login</h2>
+        <form method="POST" action="{{ url_for('login') }}" novalidate>
+            <div class="form-group">
+                <label for="identifier">Username or Email</label>
+                <input type="text" id="identifier" name="identifier" placeholder="Enter username or email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            <button type="submit">Login</button>
+            <p class="form-footer">New to Lunara? <a href="{{ url_for('signup') }}">Create an Account</a></p>
+        </form>
+    </div>
+</div>
+
+<style>
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 400px;
+    margin: 2rem auto;
+    min-height: calc(100vh - 300px - 6rem); /* Adjust for hero and padding */
+}
+
+.card {
+    width: 100%;
+    max-width: 400px;
+    padding: 1.5rem;
+    background-color: #F7F7FA;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+    color: #2A6F7F;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-group {
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #333333;
+    margin-bottom: 0.2rem;
+}
+
+.form-group input {
+    padding: 0.4rem;
+    border: 1px solid #D3D8DB;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #2A6F7F;
+    outline: none;
+}
+
+.form-group input:invalid {
+    border-color: #D9534F; /* Red for invalid input */
+}
+
+button {
+    background-color: #2A6F7F;
+    color: #FFFFFF;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #3B8A9B;
+}
+
+.form-footer {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.form-footer a {
+    color: #2A6F7F;
+    text-decoration: none;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #D9534F;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const identifierInput = document.getElementById('identifier');
+    const passwordInput = document.getElementById('password');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Reset any previous error messages
+        clearErrors();
+        
+        let isValid = true;
+        
+        // Validate username/email
+        const identifier = identifierInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!identifier) {
+            showError(identifierInput, 'Username or email is required');
+            isValid = false;
+        } else if (!emailRegex.test(identifier) && identifier.length < 3) {
+            showError(identifierInput, 'Please enter a valid email or username (minimum 3 characters)');
+            isValid = false;
+        }
+        
+        // Validate password
+        const password = passwordInput.value;
+        if (!password) {
+            showError(passwordInput, 'Password is required');
+            isValid = false;
+        } else if (password.length < 8) {
+            showError(passwordInput, 'Password must be at least 8 characters long');
+            isValid = false;
+        }
+        
+        // If all validations pass, submit the form
+        if (isValid) {
+            form.submit();
+        }
+    });
+    
+    // Helper function to show error messages
+    function showError(input, message) {
+        const formGroup = input.parentElement;
+        const error = document.createElement('div');
+        error.className = 'error-message';
+        error.textContent = message;
+        formGroup.appendChild(error);
+    }
+    
+    // Helper function to clear error messages
+    function clearErrors() {
+        const errors = document.querySelectorAll('.error-message');
+        errors.forEach(error => error.remove());
+    }
+});
+</script>
+{% endblock %}

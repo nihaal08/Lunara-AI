@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}Maternal Health Prediction - Lunara{% endblock %}
+{% block hero %}
+<div class="hero">
+    <h1>Maternal Health Risk Assessment</h1>
+    <p>Enter your vital signs to evaluate pregnancy health.</p>
+</div>
+{% endblock %}
+{% block content %}
+<div class="form-container">
+    <form id="maternal_form" method="POST" action="{{ url_for('predict_maternal') }}" class="prediction-form">
+        <!-- Personal Info Section -->
+        <div class="form-section">
+            <h3>Personal Info</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="age">
+                        Age
+                        <span class="info-btn">ⓘ<span class="tooltip">Your age in years (10-70). Age can impact pregnancy health risks.</span></span>
+                    </label>
+                    <input type="number" id="age" name="age" placeholder="e.g., 25" min="10" max="70" step="1" value="25" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vital Signs Section -->
+        <div class="form-section">
+            <h3>Vital Signs</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="systolic_bp">
+                        Systolic BP (mmHg)
+                        <span class="info-btn">ⓘ<span class="tooltip">The top number in your blood pressure reading (70.0-200.0). High systolic BP can indicate maternal health risks.</span></span>
+                    </label>
+                    <input type="number" id="systolic_bp" name="systolic_bp" placeholder="e.g., 120" min="70" max="200" step="0.1" value="120" required>
+                </div>
+                <div class="form-group">
+                    <label for="diastolic_bp">
+                        Diastolic BP (mmHg)
+                        <span class="info-btn">ⓘ<span class="tooltip">The bottom number in your blood pressure reading (40.0-120.0). Elevated diastolic BP can signal health risks.</span></span>
+                    </label>
+                    <input type="number" id="diastolic_bp" name="diastolic_bp" placeholder="e.g., 80" min="40" max="120" step="0.1" value="80" required>
+                </div>
+                <div class="form-group">
+                    <label for="bs">
+                        Blood Sugar (mmol/L)
+                        <span class="info-btn">ⓘ<span class="tooltip">Blood sugar level (4.0-20.0). High blood sugar can indicate risks like gestational diabetes.</span></span>
+                    </label>
+                    <input type="number" id="bs" name="bs" placeholder="e.g., 7" min="4" max="20" step="0.1" value="7" required>
+                </div>
+                <div class="form-group">
+                    <label for="heart_rate">
+                        Heart Rate (bpm)
+                        <span class="info-btn">ⓘ<span class="tooltip">Your heart rate in beats per minute (40-120). Abnormal heart rates can indicate maternal health issues.</span></span>
+                    </label>
+                    <input type="number" id="heart_rate" name="heart_rate" placeholder="e.g., 70" min="40" max="120" step="1" value="70" required>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Get Prediction</button>
+    </form>
+
+    {% if result %}
+    <div class="result-card">
+        <h3>Prediction Result</h3>
+        <p><strong>Maternal Health Prediction:</strong> {{ result }}</p>
+        <p><strong>Clinical Interpretation:</strong>
+            {{ "This indicates a high-risk pregnancy requiring immediate medical attention." if result == "high risk" else "This indicates a moderate risk level; consult a healthcare provider." if result == "mid risk" else "This indicates a low risk level, but regular check-ups are recommended." }}
+        </p>
+        {% if inputs %}
+        <h4>Input Values:</h4>
+        <ul>
+            {% for key, value in inputs.items() %}
+            <li>{{ key.replace('_', ' ') }}: {{ value }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.prediction-form {
+    background-color: #F7F7FA;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+    margin-bottom: 1rem;
+}
+
+.form-section h3 {
+    color: #2A6F7F;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #333333;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.5rem;
+    border: 1px solid #D3D8DB;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #2A6F7F;
+    outline: none;
+}
+
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #2A6F7F;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #3B8A9B;
+}
+
+.result-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #F7F7FA;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.result-card h3 {
+    color: #2A6F7F;
+    margin-bottom: 1rem;
+}
+
+.result-card p {
+    margin-bottom: 0.5rem;
+}
+
+.result-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.result-card li {
+    margin-bottom: 0.3rem;
+    font-size: 1rem;
+}
+
+/* Info Button and Tooltip Styles */
+.info-btn {
+    position: relative;
+    display: inline-block;
+    margin-left: 0.3rem;
+    color: #2A6F7F;
+    font-size: 0.9rem;
+    cursor: help;
+}
+
+.info-btn:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: -0.5rem;
+    left: 1.5rem;
+    transform: translateY(-100%);
+    background-color: #333333;
+    color: #FFFFFF;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 200px;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #333333 transparent transparent;
+}
+</style>
+{% endblock %}

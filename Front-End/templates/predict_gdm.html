@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% block title %}Gestational Diabetes Prediction - Lunara{% endblock %}
+{% block hero %}
+<div class="hero">
+    <h1>Gestational Diabetes Prediction</h1>
+    <p>Enter your health details to assess your risk.</p>
+</div>
+{% endblock %}
+{% block content %}
+<div class="form-container">
+    <form id="gdm_form" method="POST" action="{{ url_for('predict_gdm') }}" class="prediction-form">
+        <!-- Personal Info Section -->
+        <div class="form-section">
+            <h3>Personal Info</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="age">
+                        Age
+                        <span class="info-btn">ⓘ<span class="tooltip">Your age in years (18-50). Advanced maternal age can increase the risk of gestational diabetes.</span></span>
+                    </label>
+                    <input type="number" id="age" name="age" placeholder="e.g., 30" min="18" max="50" step="1" value="30" required>
+                </div>
+                <div class="form-group">
+                    <label for="no_pregnancy">
+                        No. of Pregnancies
+                        <span class="info-btn">ⓘ<span class="tooltip">Total number of pregnancies (0-10). More pregnancies may increase the risk of gestational diabetes.</span></span>
+                    </label>
+                    <input type="number" id="no_pregnancy" name="no_pregnancy" placeholder="e.g., 2" min="0" max="10" step="1" value="2" required>
+                </div>
+                <div class="form-group">
+                    <label for="bmi">
+                        BMI
+                        <span class="info-btn">ⓘ<span class="tooltip">Body Mass Index (15.0-50.0), calculated as weight in kg / height in m². Higher BMI can increase risk.</span></span>
+                    </label>
+                    <input type="number" id="bmi" name="bmi" placeholder="e.g., 28" min="15" max="50" step="0.1" value="28" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical History Section -->
+        <div class="form-section">
+            <h3>Medical History</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="family_history">
+                        Family History
+                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have a family history of diabetes. A genetic predisposition can increase risk.</span></span>
+                    </label>
+                    <select id="family_history" name="family_history" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="large_child">
+                        Large Child
+                        <span class="info-btn">ⓘ<span class="tooltip">Previous birth of a large child or one with a birth defect. This can indicate a higher risk of gestational diabetes.</span></span>
+                    </label>
+                    <select id="large_child" name="large_child" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pcos">
+                        PCOS
+                        <span class="info-btn">ⓘ<span class="tooltip">Polycystic Ovary Syndrome. PCOS can increase the likelihood of developing gestational diabetes.</span></span>
+                    </label>
+                    <select id="pcos" name="pcos" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sedentary">
+                        Sedentary Lifestyle
+                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have limited physical activity. A sedentary lifestyle can contribute to gestational diabetes risk.</span></span>
+                    </label>
+                    <select id="sedentary" name="sedentary" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="prediabetes">
+                        Prediabetes
+                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have a previous diagnosis of prediabetes. This indicates a higher risk of gestational diabetes.</span></span>
+                    </label>
+                    <select id="prediabetes" name="prediabetes" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clinical Measurements Section -->
+        <div class="form-section">
+            <h3>Clinical Measurements</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="hdl">
+                        HDL (mg/dL)
+                        <span class="info-btn">ⓘ<span class="tooltip">High-Density Lipoprotein cholesterol level (20.0-100.0). Low HDL levels can be associated with higher risk.</span></span>
+                    </label>
+                    <input type="number" id="hdl" name="hdl" placeholder="e.g., 50" min="20" max="100" step="0.1" value="50" required>
+                </div>
+                <div class="form-group">
+                    <label for="sys_bp">
+                        Systolic BP (mmHg)
+                        <span class="info-btn">ⓘ<span class="tooltip">The top number in your blood pressure reading (80.0-200.0). High blood pressure can be a risk factor.</span></span>
+                    </label>
+                    <input type="number" id="sys_bp" name="sys_bp" placeholder="e.g., 120" min="80" max="200" step="0.1" value="120" required>
+                </div>
+                <div class="form-group">
+                    <label for="dia_bp">
+                        Diastolic BP (mmHg)
+                        <span class="info-btn">ⓘ<span class="tooltip">The bottom number in your blood pressure reading (40.0-120.0). Elevated diastolic BP can indicate risk.</span></span>
+                    </label>
+                    <input type="number" id="dia_bp" name="dia_bp" placeholder="e.g., 80" min="40" max="120" step="0.1" value="80" required>
+                </div>
+                <div class="form-group">
+                    <label for="ogtt">
+                        OGTT (mg/dL)
+                        <span class="info-btn">ⓘ<span class="tooltip">Oral Glucose Tolerance Test result (50.0-300.0). High glucose levels can indicate gestational diabetes.</span></span>
+                    </label>
+                    <input type="number" id="ogtt" name="ogtt" placeholder="e.g., 130" min="50" max="300" step="0.1" value="130" required>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Get Prediction</button>
+    </form>
+
+    {% if result %}
+    <div class="result-card">
+        <h3>Prediction Result</h3>
+        <p><strong>Gestational Diabetes Prediction:</strong> {{ result }}</p>
+        <p><strong>Clinical Interpretation:</strong>
+            {{ "This indicates a risk for gestational diabetes. Consult an obstetrician for further evaluation." if result == "GDM" else "This indicates no immediate concern for gestational diabetes, but continue monitoring." }}
+        </p>
+        {% if inputs %}
+        <h4>Input Values:</h4>
+        <ul>
+            {% for key, value in inputs.items() %}
+            <li>{{ key.replace('_', ' ') }}: {{ value }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.prediction-form {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+    margin-bottom: 1rem;
+}
+
+.form-section h3 {
+    color: #F5A7A6;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #F5A7A6;
+    outline: none;
+}
+
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #F5A7A6;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #E59695;
+}
+
+.result-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.result-card h3 {
+    color: #F5A7A6;
+    margin-bottom: 1rem;
+}
+
+.result-card p {
+    margin-bottom: 0.5rem;
+}
+
+.result-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.result-card li {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+/* Info Button and Tooltip Styles */
+.info-btn {
+    position: relative;
+    display: inline-block;
+    margin-left: 0.3rem;
+    color: #F5A7A6;
+    font-size: 0.8rem;
+    cursor: help;
+}
+
+.info-btn:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: -0.5rem;
+    left: 1.5rem;
+    transform: translateY(-100%);
+    background-color: #333;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    width: 200px;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #333 transparent transparent;
+}
+</style>
+{% endblock %}

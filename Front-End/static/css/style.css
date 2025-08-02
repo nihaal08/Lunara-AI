@@ -1,0 +1,383 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Avenir', 'Helvetica', sans-serif;
+    color: #333333;
+    background-image: linear-gradient(rgba(247, 247, 250, 0.8), rgba(247, 247, 250, 0.8)), url('https://images.unsplash.com/photo-1576091160397-5d4be1f44c69');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #F7F7FA;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    padding: 1rem 2rem;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+nav .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2A6F7F;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+nav ul li a {
+    color: #333333;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #2A6F7F;
+}
+
+.hero {
+    background-color: #E8ECEF;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #333333;
+    margin-bottom: 2rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.3rem;
+    max-width: 600px;
+}
+
+main {
+    padding: 6rem 1rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+footer {
+    background-color: #E8ECEF;
+    padding: 1.5rem;
+    text-align: center;
+    border-top: 1px solid #D3D8DB;
+}
+
+footer p {
+    font-size: 1rem;
+    color: #4A4A4A;
+}
+
+footer a {
+    color: #2A6F7F;
+    text-decoration: none;
+    margin: 0 0.5rem;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+.card {
+    background-color: #F7F7FA;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.card h2 {
+    color: #2A6F7F;
+    margin-bottom: 1rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    color: #333333;
+    font-size: 1rem;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #D3D8DB;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333333;
+    background-color: #FFFFFF;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #2A6F7F;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+button {
+    background-color: #2A6F7F;
+    color: #FFFFFF;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #3B8A9B;
+}
+
+.model-card a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.model-card h3 {
+    color: #2A6F7F;
+    margin-bottom: 0.5rem;
+}
+
+.model-card p {
+    margin-bottom: 1rem;
+}
+
+.model-card .more-btn {
+    background-color: #2A6F7F;
+    color: #FFFFFF;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.model-card .more-btn:hover {
+    background-color: #3B8A9B;
+}
+
+.flash-message {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.flash-message.success {
+    background-color: #C3E6CB;
+    color: #1A3C34;
+}
+
+.flash-message.error {
+    background-color: #F5C6CB;
+    color: #5A1F27;
+}
+
+.models-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.model-card {
+    background-color: #F7F7FA;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.model-card:hover {
+    transform: translateY(-5px);
+}
+
+.testimonial-slideshow {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.testimonial {
+    background-color: #F7F7FA;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.testimonial.active {
+    display: block;
+    animation: fade 1s ease-in-out;
+}
+
+@keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#admin .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.card table th, .card table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #D3D8DB;
+}
+
+.card table th {
+    background-color: #E8ECEF;
+    color: #333333;
+}
+
+.tooltip {
+    position: relative;
+    width: 100%;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333333;
+    color: #FFFFFF;
+    text-align: center;
+    border-radius: 8px;
+    padding: 0.5rem;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 105%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.9rem;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+#login, #signup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+#login .container, #signup .container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    gap: 3rem;
+    align-items: center;
+}
+
+#login .card, #signup .card {
+    width: 40%;
+    min-width: 350px;
+}
+
+#login .welcome-text, #signup .welcome-text {
+    width: 60%;
+    padding: 3rem;
+    text-align: center;
+}
+
+#login .welcome-text h1, #signup .welcome-text h1 {
+    color: #2A6F7F;
+    margin-bottom: 1rem;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.benefit {
+    text-align: center;
+    padding: 1rem;
+}
+
+.benefit img {
+    width: 50px;
+    margin-bottom: 1rem;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.step {
+    text-align: center;
+    padding: 1rem;
+}
+
+.step img {
+    width: 50px;
+    margin-bottom: 1rem;
+}

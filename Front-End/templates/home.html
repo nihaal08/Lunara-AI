@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Lunara - Maternal Health Prediction{% endblock %}
+{% block hero %}
+<div class="hero">
+    <h1>Welcome to Lunara</h1>
+    <p>Empowering maternal health with AI-driven predictions.</p>
+</div>
+{% endblock %}
+{% block content %}
+<h2 style="text-align: center; color: #F5A7A6;">Our Prediction Models</h2>
+<div class="models-grid">
+    <div class="model-card">
+        <h3>Gestational Diabetes</h3>
+        <p>Assess your risk for gestational diabetes during pregnancy.</p>
+        <a href="{{ url_for('predict_gdm') }}" class="more-btn">More</a>
+    </div>
+    <div class="model-card">
+        <h3>Maternal Health</h3>
+        <p>Evaluate overall maternal health risks.</p>
+        <a href="{{ url_for('predict_maternal') }}" class="more-btn">More</a>
+    </div>
+    <div class="model-card">
+        <h3>Preeclampsia</h3>
+        <p>Monitor risks for preeclampsia during pregnancy.</p>
+        <a href="{{ url_for('predict_preeclampsia') }}" class="more-btn">More</a>
+    </div>
+</div>
+
+<h2 style="text-align: center; color: #F5A7A6; margin-top: 3rem;">Why Choose Lunara</h2>
+<div class="benefits-grid">
+    <div class="benefit">
+        <h3>High Accuracy</h3>
+        <p>Our models are trained on extensive datasets for reliable predictions.</p>
+    </div>
+    <div class="benefit">
+        <h3>Easy to Use</h3>
+        <p>Simple forms to input your health data and get instant results.</p>
+    </div>
+    <div class="benefit">
+        <h3>24/7 Support</h3>
+        <p>Our team is here to assist you anytime.</p>
+    </div>
+</div>
+
+<h2 style="text-align: center; color: #F5A7A6; margin-top: 3rem;">How It Works</h2>
+<div class="steps-grid">
+    <div class="step">
+        <h3>Step 1: Sign Up</h3>
+        <p>Create an account to access our tools.</p>
+    </div>
+    <div class="step">
+        <h3>Step 2: Enter Data</h3>
+        <p>Input your health metrics into our forms.</p>
+    </div>
+    <div class="step">
+        <p>Receive instant predictions and download your report.</p>
+    </div>
+</div>
+
+<h2 style="text-align: center; color: #F5A7A6; margin-top: 3rem;">What Our Users Say</h2>
+<div class="testimonial-slideshow">
+    <div class="testimonial active">
+        <p>"Lunara helped me monitor my pregnancy risks with ease!"</p>
+        <p><strong>- Sarah M.</strong></p>
+    </div>
+    <div class="testimonial">
+        <p>"The predictions were spot on, and the interface is so user-friendly."</p>
+        <p><strong>- Priya R.</strong></p>
+    </div>
+    <div class="testimonial">
+        <p>"I feel more empowered to take care of my health thanks to Lunara."</p>
+        <p><strong>- Emily T.</strong></p>
+    </div>
+    <div class="testimonial">
+        <p>"The downloadable reports are so helpful for my doctor visits."</p>
+        <p><strong>- Anjali K.</strong></p>
+    </div>
+    <div class="testimonial">
+        <p>"Lunara's support team was amazing when I had questions."</p>
+        <p><strong>- Maria S.</strong></p>
+    </div>
+</div>
+
+<script>
+    const testimonials = document.querySelectorAll('.testimonial');
+    let currentIndex = 0;
+
+    function showNextTestimonial() {
+        testimonials[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % testimonials.length;
+        testimonials[currentIndex].classList.add('active');
+    }
+
+    testimonials[currentIndex].classList.add('active');
+    setInterval(showNextTestimonial, 3000);
+</script>
+{% endblock %}
