@@ -7,6 +7,7 @@ from app.decorators import admin_required
 admin_bp = Blueprint("admin", __name__)
 
 
+@admin_bp.route("/admin")
 @admin_bp.route("/admin/dashboard")
 @admin_required
 def admin_dashboard():

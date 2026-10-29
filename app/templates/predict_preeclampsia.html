@@ -1,85 +1,83 @@
 {% extends "base.html" %}
-{% block title %}Preeclampsia Prediction - Lunara{% endblock %}
+{% block title %}Preeclampsia Risk Prediction - LUNARA{% endblock %}
+
 {% block hero %}
-<div class="hero">
-    <h1>Preeclampsia Prediction</h1>
-    <p>Enter the required details to predict the risk of preeclampsia during pregnancy.</p>
-</div>
+<section class="hero">
+    <h1><i class="fas fa-stethoscope"></i> Preeclampsia Screening & Risk Prediction</h1>
+    <p>Comprehensive early risk detection utilizing obstetric history, biometrics, hemoglobin, and fetal indicators.</p>
+</section>
 {% endblock %}
+
 {% block content %}
 <div class="form-container">
-    <form method="POST" class="prediction-form">
-        <!-- Pregnancy Info Section -->
+    <form method="POST" action="{{ url_for('predictions.predict_preeclampsia') }}" class="prediction-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Pregnancy History Section -->
         <div class="form-section">
-            <h3>Pregnancy Info</h3>
+            <h3><i class="fas fa-baby"></i> Obstetric & Gestational Details</h3>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="gravida">
-                        Gravida
-                        <span class="info-btn">ⓘ<span class="tooltip">The total number of pregnancies, including the current one. Helps assess pregnancy history and risk factors.</span></span>
+                        Gravida (Total Pregnancies)
+                        <span class="info-btn" title="Total number of pregnancies including current (0-15).">ⓘ</span>
                     </label>
-                    <input type="number" id="gravida" name="gravida" required placeholder="e.g., 2">
+                    <input type="number" id="gravida" name="gravida" min="0" max="15" value="{{ inputs['gravida'] if inputs and 'gravida' in inputs else 2 }}" required placeholder="e.g., 2">
                 </div>
                 <div class="form-group">
                     <label for="parity">
-                        Parity
-                        <span class="info-btn">ⓘ<span class="tooltip">The number of times you’ve given birth to a fetus with a gestational age of 20 weeks or more. Indicates prior delivery experience.</span></span>
+                        Parity (Previous Births)
+                        <span class="info-btn" title="Number of previous deliveries past 20 weeks (0-15).">ⓘ</span>
                     </label>
-                    <input type="number" id="parity" name="parity" required placeholder="e.g., 1">
+                    <input type="number" id="parity" name="parity" min="0" max="15" value="{{ inputs['parity'] if inputs and 'parity' in inputs else 1 }}" required placeholder="e.g., 1">
                 </div>
                 <div class="form-group">
                     <label for="gestational_age">
                         Gestational Age (weeks)
-                        <span class="info-btn">ⓘ<span class="tooltip">The current age of the pregnancy in weeks. Critical for assessing preeclampsia risk at different stages.</span></span>
+                        <span class="info-btn" title="Current gestational age (10-44 weeks).">ⓘ</span>
                     </label>
-                    <input type="number" step="0.1" id="gestational_age" name="gestational_age" required placeholder="e.g., 28.5">
+                    <input type="number" step="0.1" id="gestational_age" name="gestational_age" min="10" max="44" value="{{ inputs['Gestational_Age_Weeks'] if inputs and 'Gestational_Age_Weeks' in inputs else 22.0 }}" required placeholder="e.g., 22.0">
                 </div>
             </div>
         </div>
 
-        <!-- Personal Info Section -->
+        <!-- Personal & Biometric Section -->
         <div class="form-section">
-            <h3>Personal Info</h3>
+            <h3><i class="fas fa-user"></i> Patient Biometrics</h3>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="age">
-                        Age
-                        <span class="info-btn">ⓘ<span class="tooltip">Your age in years. Advanced maternal age (over 35) can increase preeclampsia risk.</span></span>
+                        Age (years)
+                        <span class="info-btn" title="Patient age in years (15-60).">ⓘ</span>
                     </label>
-                    <input type="number" id="age" name="age" required placeholder="e.g., 30">
+                    <input type="number" id="age" name="age" min="15" max="60" value="{{ inputs['Age'] if inputs and 'Age' in inputs else 26 }}" required placeholder="e.g., 26">
                 </div>
                 <div class="form-group">
                     <label for="bmi">
-                        BMI
-                        <span class="info-btn">ⓘ<span class="tooltip">Body Mass Index (weight in kg / height in m²). Higher BMI can be a risk factor for preeclampsia.</span></span>
+                        BMI (kg/m²)
+                        <span class="info-btn" title="Body Mass Index (15-60).">ⓘ</span>
                     </label>
-                    <input type="number" step="0.1" id="bmi" name="bmi" required placeholder="e.g., 25.5">
+                    <input type="number" step="0.1" id="bmi" name="bmi" min="15" max="60" value="{{ inputs['BMI'] if inputs and 'BMI' in inputs else 22.5 }}" required placeholder="e.g., 22.5">
                 </div>
             </div>
         </div>
 
         <!-- Medical History Section -->
         <div class="form-section">
-            <h3>Medical History</h3>
+            <h3><i class="fas fa-notes-medical"></i> Medical History</h3>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="diabetes">
-                        Diabetes
-                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have diabetes (pre-existing or gestational). Diabetes can increase the risk of preeclampsia.</span></span>
-                    </label>
+                    <label for="diabetes">Pre-existing / Gestational Diabetes</label>
                     <select id="diabetes" name="diabetes" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('diabetes') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('diabetes') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="hypertension">
-                        Hypertension History
-                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have a history of high blood pressure before pregnancy. A key risk factor for preeclampsia.</span></span>
-                    </label>
+                    <label for="hypertension">Chronic Hypertension History</label>
                     <select id="hypertension" name="hypertension" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('Hypertension_History') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('Hypertension_History') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
             </div>
@@ -87,111 +85,123 @@
 
         <!-- Clinical Measurements Section -->
         <div class="form-section">
-            <h3>Clinical Measurements</h3>
+            <h3><i class="fas fa-microscope"></i> Clinical & Fetal Measurements</h3>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="systolic_bp">
-                        Systolic BP (mmHg)
-                        <span class="info-btn">ⓘ<span class="tooltip">The top number in your blood pressure reading. High systolic BP is a major indicator of preeclampsia.</span></span>
-                    </label>
-                    <input type="number" step="0.1" id="systolic_bp" name="systolic_bp" required placeholder="e.g., 120">
+                    <label for="systolic_bp">Systolic BP (mmHg)</label>
+                    <input type="number" step="0.1" id="systolic_bp" name="systolic_bp" min="60" max="220" value="{{ inputs['Systolic BP'] if inputs and 'Systolic BP' in inputs else 115.0 }}" required placeholder="e.g., 115.0">
                 </div>
                 <div class="form-group">
-                    <label for="diastolic_bp">
-                        Diastolic BP (mmHg)
-                        <span class="info-btn">ⓘ<span class="tooltip">The bottom number in your blood pressure reading. Elevated diastolic BP can signal preeclampsia risk.</span></span>
-                    </label>
-                    <input type="number" step="0.1" id="diastolic_bp" name="diastolic_bp" required placeholder="e.g., 80">
+                    <label for="diastolic_bp">Diastolic BP (mmHg)</label>
+                    <input type="number" step="0.1" id="diastolic_bp" name="diastolic_bp" min="40" max="130" value="{{ inputs['Diastolic BP'] if inputs and 'Diastolic BP' in inputs else 75.0 }}" required placeholder="e.g., 75.0">
                 </div>
                 <div class="form-group">
-                    <label for="hb">
-                        Hemoglobin (g/dL)
-                        <span class="info-btn">ⓘ<span class="tooltip">Measures the protein in red blood cells that carries oxygen. Abnormal levels can indicate health issues related to preeclampsia.</span></span>
-                    </label>
-                    <input type="number" step="0.1" id="hb" name="hb" required placeholder="e.g., 12.5">
+                    <label for="hb">Hemoglobin (HB, g/dL)</label>
+                    <input type="number" step="0.1" id="hb" name="hb" min="4" max="20" value="{{ inputs['HB'] if inputs and 'HB' in inputs else 11.5 }}" required placeholder="e.g., 11.5">
                 </div>
                 <div class="form-group">
-                    <label for="fetal_weight">
-                        Fetal Weight (kg)
-                        <span class="info-btn">ⓘ<span class="tooltip">Estimated weight of the fetus. Abnormal fetal growth can be associated with preeclampsia.</span></span>
-                    </label>
-                    <input type="number" step="0.1" id="fetal_weight" name="fetal_weight" required placeholder="e.g., 2.5">
+                    <label for="fetal_weight">Fetal Weight (kg)</label>
+                    <input type="number" step="0.01" id="fetal_weight" name="fetal_weight" min="0.05" max="6.0" value="{{ inputs['Fetal_Weight'] if inputs and 'Fetal_Weight' in inputs else 0.50 }}" required placeholder="e.g., 0.50">
                 </div>
                 <div class="form-group">
-                    <label for="protein_uria">
-                        Protein Uria
-                        <span class="info-btn">ⓘ<span class="tooltip">Presence of excess protein in your urine. A key diagnostic marker for preeclampsia.</span></span>
-                    </label>
+                    <label for="protein_uria">Proteinuria Present</label>
                     <select id="protein_uria" name="protein_uria" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('Protein_Uria') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('Protein_Uria') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="amniotic_fluid">
-                        Amniotic Fluid (cm)
-                        <span class="info-btn">ⓘ<span class="tooltip">The amount of fluid surrounding the fetus, measured in centimeters. Abnormal levels can indicate complications like preeclampsia.</span></span>
-                    </label>
-                    <input type="number" step="0.1" id="amniotic_fluid" name="amniotic_fluid" required placeholder="e.g., 15">
+                    <label for="amniotic_fluid">Amniotic Fluid Levels (cm)</label>
+                    <input type="number" step="0.1" id="amniotic_fluid" name="amniotic_fluid" min="2" max="35" value="{{ inputs['Amniotic_Fluid_Levels'] if inputs and 'Amniotic_Fluid_Levels' in inputs else 12.0 }}" required placeholder="e.g., 12.0">
                 </div>
             </div>
         </div>
 
-        <button type="submit" class="submit-btn">Predict</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+            <i class="fas fa-magic"></i> Calculate Preeclampsia Prediction
+        </button>
     </form>
 
     {% if result %}
-    <div class="result-card">
-        <h3>Prediction Result</h3>
-        <p><strong>Risk Level:</strong> {{ result }}</p>
-        <p><strong>Clinical Interpretation:</strong></p>
-        <p>
-            {% if result == 'high' %}
-            This indicates a high risk of preeclampsia. Immediate medical consultation is advised.
-            {% elif result == 'mid' %}
-            This indicates a moderate risk level; consult a healthcare provider.
+    <div class="result-card {% if 'high' in result|lower %}result-danger{% elif 'mid' in result|lower %}result-warning{% else %}result-success{% endif %}">
+        <div class="result-header">
+            <div class="result-badge">
+                <i class="fas fa-{% if 'high' in result|lower %}exclamation-triangle{% elif 'mid' in result|lower %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                <span>{{ result|title }} Risk</span>
+            </div>
+            <h3>Preeclampsia Screening Assessment</h3>
+        </div>
+        <p class="result-interpretation">
+            <strong>Clinical Interpretation:</strong>
+            {% if "high" in result|lower %}
+                The AI model identified critical indicators for <strong>High Risk of Preeclampsia</strong>. Immediate maternal-fetal medical consultation and frequent blood pressure / protein monitoring are urgently advised.
+            {% elif "mid" in result|lower %}
+                The AI model evaluated a <strong>Moderate Risk of Preeclampsia</strong>. Closer surveillance of blood pressure and periodic urinalysis are recommended.
             {% else %}
-            This indicates a low risk level, but regular monitoring is recommended.
+                The AI model evaluated a <strong>Low Risk of Preeclampsia</strong>. Current clinical and ultrasound parameters show no immediate indicators of preeclampsia. Continue standard prenatal care.
             {% endif %}
         </p>
-        <h4>Input Values:</h4>
-        <ul>
-            {% for key, value in inputs.items() %}
-            <li>{{ key.replace('_', ' ') }}: {{ value }}</li>
-            {% endfor %}
-        </ul>
+
+        {% if inputs %}
+        <div class="result-inputs">
+            <h4>Analyzed Screening Parameters:</h4>
+            <div class="params-summary">
+                {% for key, value in inputs.items() %}
+                <div class="param-item">
+                    <span class="param-key">{{ key.replace('_', ' ') }}</span>
+                    <span class="param-val">{{ value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+            <a href="{{ url_for('history.view_history') }}" class="btn btn-outline">
+                <i class="fas fa-history"></i> View Prediction History
+            </a>
+            <a href="{{ url_for('main.home') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+        </div>
     </div>
     {% endif %}
 </div>
 
 <style>
 .form-container {
-    max-width: 800px;
+    max-width: 850px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
 .prediction-form {
-    background-color: #ffffff;
-    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .form-section {
-    margin-bottom: 1rem;
+    margin-bottom: 1.8rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .form-section h3 {
-    color: #F5A7A6;
+    color: var(--color-primary);
     font-size: 1.2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
 }
 
 .form-group {
@@ -201,112 +211,120 @@
 
 .form-group label {
     font-size: 0.9rem;
-    color: #333;
-    margin-bottom: 0.3rem;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+}
+
+.info-btn {
+    color: var(--color-primary-light);
+    cursor: help;
+    font-size: 0.95rem;
 }
 
 .form-group input,
 .form-group select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    transition: border-color 0.3s ease;
+    padding: 0.65rem 0.85rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #F5A7A6;
+    border-color: var(--color-primary);
     outline: none;
-}
-
-.submit-btn {
-    display: block;
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #F5A7A6;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.submit-btn:hover {
-    background-color: #E59695;
+    box-shadow: 0 0 0 3px rgba(42, 111, 127, 0.2);
 }
 
 .result-card {
     margin-top: 2rem;
-    padding: 1.5rem;
-    background-color: #ffffff;
+    padding: 2rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
 }
 
-.result-card h3 {
-    color: #F5A7A6;
+.result-danger {
+    border-left: 6px solid #E74C3C;
+}
+
+.result-warning {
+    border-left: 6px solid #F39C12;
+}
+
+.result-success {
+    border-left: 6px solid #27AE60;
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.result-card p {
-    margin-bottom: 0.5rem;
+.result-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.result-card ul {
-    list-style: none;
-    padding: 0;
+.result-danger .result-badge {
+    background: rgba(231, 76, 60, 0.15);
+    color: #C0392B;
 }
 
-.result-card li {
-    margin-bottom: 0.3rem;
-    font-size: 0.9rem;
+.result-warning .result-badge {
+    background: rgba(243, 156, 18, 0.15);
+    color: #D35400;
 }
 
-/* Info Button and Tooltip Styles */
-.info-btn {
-    position: relative;
-    display: inline-block;
-    margin-left: 0.3rem;
-    color: #F5A7A6;
-    font-size: 0.8rem;
-    cursor: help;
+.result-success .result-badge {
+    background: rgba(39, 174, 96, 0.15);
+    color: #27AE60;
 }
 
-.info-btn:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
+.result-interpretation {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
-.tooltip {
-    visibility: hidden;
-    opacity: 0;
-    position: absolute;
-    top: -0.5rem;
-    left: 1.5rem;
-    transform: translateY(-100%);
-    background-color: #333;
-    color: #fff;
-    padding: 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    width: 200px;
-    z-index: 1;
-    transition: opacity 0.3s ease;
+.params-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
 }
 
-.tooltip::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    transform: translateY(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent #333 transparent transparent;
+.param-item {
+    background: var(--bg-tertiary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.param-key {
+    color: var(--text-secondary);
+}
+
+.param-val {
+    font-weight: 600;
+    color: var(--text-primary);
 }
 </style>
 {% endblock %}

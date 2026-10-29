@@ -7,10 +7,19 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 auth_bp = Blueprint("auth", __name__)
 
 
+def is_safe_redirect(target: str | None) -> bool:
+    """Ensure redirect target is a safe relative internal URL."""
+    if not target:
+        return False
+    return target.startswith("/") and not target.startswith("//") and "\\" not in target
+
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if "user_id" in session:
         return redirect(url_for("main.home"))
+
+    next_url = request.args.get("next") or request.form.get("next")
 
     if request.method == "POST":
         identifier = request.form.get("identifier", "").strip()
@@ -18,7 +27,7 @@ def login():
 
         if not identifier or not password:
             flash("Please provide both username/email and password.", "error")
-            return render_template("login.html")
+            return render_template("login.html", identifier=identifier, next=next_url)
 
         try:
             user = current_app.auth_service.authenticate(identifier, password)
@@ -29,13 +38,18 @@ def login():
                 session["is_admin"] = user["is_admin"]
                 current_app.audit_service.log(user["id"], "login")
                 flash(f"Welcome back, {user['username']}!", "success")
+
+                if is_safe_redirect(next_url):
+                    return redirect(next_url)
                 return redirect(url_for("main.home"))
             flash("Invalid username/email or password.", "error")
         except Exception:
             current_app.logger.exception("Login error")
             flash("An error occurred during login. Please try again.", "error")
 
-    return render_template("login.html")
+        return render_template("login.html", identifier=identifier, next=next_url)
+
+    return render_template("login.html", next=next_url)
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
@@ -50,18 +64,20 @@ def signup():
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
 
+        form_data = {"username": username, "full_name": full_name, "email": email}
+
         if not all([username, full_name, email, password, confirm_password]):
             flash("All fields are required.", "error")
-            return render_template("signup.html")
+            return render_template("signup.html", form_data=form_data)
         if len(username) < 3:
             flash("Username must be at least 3 characters long.", "error")
-            return render_template("signup.html")
+            return render_template("signup.html", form_data=form_data)
         if len(password) < 6:
             flash("Password must be at least 6 characters long.", "error")
-            return render_template("signup.html")
+            return render_template("signup.html", form_data=form_data)
         if password != confirm_password:
             flash("Passwords do not match.", "error")
-            return render_template("signup.html")
+            return render_template("signup.html", form_data=form_data)
 
         try:
             current_app.auth_service.create_user(username, full_name, email, password)
@@ -69,9 +85,11 @@ def signup():
             return redirect(url_for("auth.login"))
         except sqlite3.IntegrityError:
             flash("Username or email already exists.", "error")
+            return render_template("signup.html", form_data=form_data)
         except Exception:
             current_app.logger.exception("Signup error")
             flash("An error occurred during registration.", "error")
+            return render_template("signup.html", form_data=form_data)
 
     return render_template("signup.html")
 

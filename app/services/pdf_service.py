@@ -12,22 +12,22 @@ class PredictionReportPDF(FPDF):
 
     def header(self):
         self.set_font("Helvetica", "B", 16)
-        self.cell(0, 10, "LUNARA Medical Prediction Report", 0, 1, "C")
+        self.cell(0, 10, "LUNARA Medical Prediction Report", align="C", new_x="LMARGIN", new_y="NEXT")
         self.set_font("Helvetica", "", 10)
         self.cell(
-            0, 5, f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 0, 1, "C"
+            0, 5, f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", align="C", new_x="LMARGIN", new_y="NEXT"
         )
         self.ln(7)
 
     def footer(self):
         self.set_y(-15)
         self.set_font("Helvetica", "I", 8)
-        self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
+        self.cell(0, 10, f"Page {self.page_no()}", align="C")
 
     def chapter_title(self, title: str):
         self.set_font("Helvetica", "B", 12)
         self.set_text_color(42, 111, 127)
-        self.cell(0, 10, title, 0, 1)
+        self.cell(0, 10, title, new_x="LMARGIN", new_y="NEXT")
         self.set_text_color(0, 0, 0)
         self.ln(2)
 
@@ -68,7 +68,7 @@ def generate_prediction_pdf(predictions: list[dict]) -> io.BytesIO:
         "for diagnosis and treatment decisions."
     )
 
-    pdf_bytes = pdf.output(dest="S")
+    pdf_bytes = bytes(pdf.output())
     if isinstance(pdf_bytes, str):
         pdf_bytes = pdf_bytes.encode("latin-1")
 

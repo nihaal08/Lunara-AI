@@ -10,12 +10,21 @@ class DatabaseManager:
 
     def __init__(self, db_path: str):
         self.db_path = db_path
-        if db_path != ":memory:":
+        self._shared_conn = None
+        self._mem_uri = None
+        if db_path == ":memory:":
+            self._mem_uri = f"file:lunara_mem_{id(self)}?mode=memory&cache=shared"
+            self._shared_conn = sqlite3.connect(self._mem_uri, uri=True, check_same_thread=False)
+            self._shared_conn.execute("PRAGMA foreign_keys = ON")
+        else:
             from pathlib import Path
             Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
     def get_connection(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.db_path)
+        if self._mem_uri:
+            conn = sqlite3.connect(self._mem_uri, uri=True, check_same_thread=False)
+        else:
+            conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
         return conn

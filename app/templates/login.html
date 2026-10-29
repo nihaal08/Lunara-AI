@@ -18,11 +18,16 @@
         </div>
 
         <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
             <div class="form-group">
                 <label for="identifier">
                     <i class="fas fa-user"></i> Username or Email
                 </label>
                 <input type="text" id="identifier" name="identifier" 
+                    value="{{ identifier or '' }}"
                     placeholder="Enter your username or email" 
                     required autocomplete="username">
             </div>

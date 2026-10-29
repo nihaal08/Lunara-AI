@@ -1,94 +1,83 @@
 {% extends "base.html" %}
-{% block title %}Gestational Diabetes Prediction - Lunara{% endblock %}
+{% block title %}Gestational Diabetes Prediction - LUNARA{% endblock %}
+
 {% block hero %}
-<div class="hero">
-    <h1>Gestational Diabetes Prediction</h1>
-    <p>Enter your health details to assess your risk.</p>
-</div>
+<section class="hero">
+    <h1><i class="fas fa-droplet-alt"></i> Gestational Diabetes Prediction</h1>
+    <p>Enter patient clinical and physiological metrics to assess gestational diabetes risk with high accuracy.</p>
+</section>
 {% endblock %}
+
 {% block content %}
 <div class="form-container">
     <form id="gdm_form" method="POST" action="{{ url_for('predictions.predict_gdm') }}" class="prediction-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <!-- Personal Info Section -->
         <div class="form-section">
-            <h3>Personal Info</h3>
+            <h3><i class="fas fa-user"></i> Personal Information</h3>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="age">
-                        Age
-                        <span class="info-btn">ⓘ<span class="tooltip">Your age in years (18-50). Advanced maternal age can increase the risk of gestational diabetes.</span></span>
+                        Age (years)
+                        <span class="info-btn" title="Maternal age (15-65). Advanced maternal age can increase risk.">ⓘ</span>
                     </label>
-                    <input type="number" id="age" name="age" placeholder="e.g., 30" min="18" max="50" step="1" value="30" required>
+                    <input type="number" id="age" name="age" placeholder="e.g., 30" min="15" max="65" step="1" value="{{ inputs['Age'] if inputs and 'Age' in inputs else 30 }}" required>
                 </div>
                 <div class="form-group">
                     <label for="no_pregnancy">
                         No. of Pregnancies
-                        <span class="info-btn">ⓘ<span class="tooltip">Total number of pregnancies (0-10). More pregnancies may increase the risk of gestational diabetes.</span></span>
+                        <span class="info-btn" title="Total number of pregnancies (0-15).">ⓘ</span>
                     </label>
-                    <input type="number" id="no_pregnancy" name="no_pregnancy" placeholder="e.g., 2" min="0" max="10" step="1" value="2" required>
+                    <input type="number" id="no_pregnancy" name="no_pregnancy" placeholder="e.g., 2" min="0" max="15" step="1" value="{{ inputs['No of Pregnancy'] if inputs and 'No of Pregnancy' in inputs else 2 }}" required>
                 </div>
                 <div class="form-group">
                     <label for="bmi">
-                        BMI
-                        <span class="info-btn">ⓘ<span class="tooltip">Body Mass Index (15.0-50.0), calculated as weight in kg / height in m². Higher BMI can increase risk.</span></span>
+                        BMI (kg/m²)
+                        <span class="info-btn" title="Body Mass Index (15.0-60.0). Higher BMI increases risk.">ⓘ</span>
                     </label>
-                    <input type="number" id="bmi" name="bmi" placeholder="e.g., 28" min="15" max="50" step="0.1" value="28" required>
+                    <input type="number" id="bmi" name="bmi" placeholder="e.g., 28.0" min="15" max="60" step="0.1" value="{{ inputs['BMI'] if inputs and 'BMI' in inputs else 28.0 }}" required>
                 </div>
             </div>
         </div>
 
         <!-- Medical History Section -->
         <div class="form-section">
-            <h3>Medical History</h3>
+            <h3><i class="fas fa-notes-medical"></i> Medical History</h3>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="family_history">
-                        Family History
-                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have a family history of diabetes. A genetic predisposition can increase risk.</span></span>
-                    </label>
+                    <label for="family_history">Family History of Diabetes</label>
                     <select id="family_history" name="family_history" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('Family History') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('Family History') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="large_child">
-                        Large Child
-                        <span class="info-btn">ⓘ<span class="tooltip">Previous birth of a large child or one with a birth defect. This can indicate a higher risk of gestational diabetes.</span></span>
-                    </label>
+                    <label for="large_child">Large Child / Birth Defect History</label>
                     <select id="large_child" name="large_child" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('Large Child or Birth Default') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('Large Child or Birth Default') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="pcos">
-                        PCOS
-                        <span class="info-btn">ⓘ<span class="tooltip">Polycystic Ovary Syndrome. PCOS can increase the likelihood of developing gestational diabetes.</span></span>
-                    </label>
+                    <label for="pcos">PCOS History</label>
                     <select id="pcos" name="pcos" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('PCOS') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('PCOS') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="sedentary">
-                        Sedentary Lifestyle
-                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have limited physical activity. A sedentary lifestyle can contribute to gestational diabetes risk.</span></span>
-                    </label>
+                    <label for="sedentary">Sedentary Lifestyle</label>
                     <select id="sedentary" name="sedentary" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('Sedentary Lifestyle') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('Sedentary Lifestyle') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="prediabetes">
-                        Prediabetes
-                        <span class="info-btn">ⓘ<span class="tooltip">Whether you have a previous diagnosis of prediabetes. This indicates a higher risk of gestational diabetes.</span></span>
-                    </label>
+                    <label for="prediabetes">Prediabetes Diagnosis</label>
                     <select id="prediabetes" name="prediabetes" required>
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
+                        <option value="0" {{ 'selected' if inputs and inputs.get('Prediabetes') == 0 else '' }}>No</option>
+                        <option value="1" {{ 'selected' if inputs and inputs.get('Prediabetes') == 1 else '' }}>Yes</option>
                     </select>
                 </div>
             </div>
@@ -96,89 +85,110 @@
 
         <!-- Clinical Measurements Section -->
         <div class="form-section">
-            <h3>Clinical Measurements</h3>
+            <h3><i class="fas fa-stethoscope"></i> Clinical Measurements</h3>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="hdl">
-                        HDL (mg/dL)
-                        <span class="info-btn">ⓘ<span class="tooltip">High-Density Lipoprotein cholesterol level (20.0-100.0). Low HDL levels can be associated with higher risk.</span></span>
-                    </label>
-                    <input type="number" id="hdl" name="hdl" placeholder="e.g., 50" min="20" max="100" step="0.1" value="50" required>
+                    <label for="hdl">HDL Cholesterol (mg/dL)</label>
+                    <input type="number" id="hdl" name="hdl" placeholder="e.g., 50.0" min="15" max="120" step="0.1" value="{{ inputs['HDL'] if inputs and 'HDL' in inputs else 50.0 }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="sys_bp">
-                        Systolic BP (mmHg)
-                        <span class="info-btn">ⓘ<span class="tooltip">The top number in your blood pressure reading (80.0-200.0). High blood pressure can be a risk factor.</span></span>
-                    </label>
-                    <input type="number" id="sys_bp" name="sys_bp" placeholder="e.g., 120" min="80" max="200" step="0.1" value="120" required>
+                    <label for="sys_bp">Systolic BP (mmHg)</label>
+                    <input type="number" id="sys_bp" name="sys_bp" placeholder="e.g., 120" min="70" max="220" step="0.1" value="{{ inputs['Sys_BP'] if inputs and 'Sys_BP' in inputs else 120.0 }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="dia_bp">
-                        Diastolic BP (mmHg)
-                        <span class="info-btn">ⓘ<span class="tooltip">The bottom number in your blood pressure reading (40.0-120.0). Elevated diastolic BP can indicate risk.</span></span>
-                    </label>
-                    <input type="number" id="dia_bp" name="dia_bp" placeholder="e.g., 80" min="40" max="120" step="0.1" value="80" required>
+                    <label for="dia_bp">Diastolic BP (mmHg)</label>
+                    <input type="number" id="dia_bp" name="dia_bp" placeholder="e.g., 80" min="40" max="130" step="0.1" value="{{ inputs['Dia_BP'] if inputs and 'Dia_BP' in inputs else 80.0 }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="ogtt">
-                        OGTT (mg/dL)
-                        <span class="info-btn">ⓘ<span class="tooltip">Oral Glucose Tolerance Test result (50.0-300.0). High glucose levels can indicate gestational diabetes.</span></span>
-                    </label>
-                    <input type="number" id="ogtt" name="ogtt" placeholder="e.g., 130" min="50" max="300" step="0.1" value="130" required>
+                    <label for="ogtt">OGTT Glucose (mg/dL)</label>
+                    <input type="number" id="ogtt" name="ogtt" placeholder="e.g., 130" min="40" max="350" step="0.1" value="{{ inputs['OGTT'] if inputs and 'OGTT' in inputs else 130.0 }}" required>
                 </div>
             </div>
         </div>
 
-        <button type="submit" class="submit-btn">Get Prediction</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+            <i class="fas fa-magic"></i> Calculate GDM Prediction
+        </button>
     </form>
 
     {% if result %}
-    <div class="result-card">
-        <h3>Prediction Result</h3>
-        <p><strong>Gestational Diabetes Prediction:</strong> {{ result }}</p>
-        <p><strong>Clinical Interpretation:</strong>
-            {{ "This indicates a risk for gestational diabetes. Consult an obstetrician for further evaluation." if result == "GDM" else "This indicates no immediate concern for gestational diabetes, but continue monitoring." }}
+    <div class="result-card {% if result == 'GDM' %}result-danger{% else %}result-success{% endif %}">
+        <div class="result-header">
+            <div class="result-badge">
+                <i class="fas fa-{% if result == 'GDM' %}exclamation-triangle{% else %}shield-check{% endif %}"></i>
+                <span>{{ result }}</span>
+            </div>
+            <h3>Gestational Diabetes Assessment</h3>
+        </div>
+        <p class="result-interpretation">
+            <strong>Clinical Interpretation:</strong>
+            {% if result == "GDM" %}
+                The AI model identified high risk indicators for Gestational Diabetes Mellitus (GDM). Prompt clinical evaluation with an obstetrician and targeted nutritional monitoring are strongly advised.
+            {% else %}
+                The AI model evaluated the parameters as Non-GDM (low risk). Continue standard prenatal checkups and maintain a healthy, active lifestyle.
+            {% endif %}
         </p>
+
         {% if inputs %}
-        <h4>Input Values:</h4>
-        <ul>
-            {% for key, value in inputs.items() %}
-            <li>{{ key.replace('_', ' ') }}: {{ value }}</li>
-            {% endfor %}
-        </ul>
+        <div class="result-inputs">
+            <h4>Analyzed Clinical Parameters:</h4>
+            <div class="params-summary">
+                {% for key, value in inputs.items() %}
+                <div class="param-item">
+                    <span class="param-key">{{ key.replace('_', ' ') }}</span>
+                    <span class="param-val">{{ value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
         {% endif %}
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+            <a href="{{ url_for('history.view_history') }}" class="btn btn-outline">
+                <i class="fas fa-history"></i> View Prediction History
+            </a>
+            <a href="{{ url_for('main.home') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+        </div>
     </div>
     {% endif %}
 </div>
 
 <style>
 .form-container {
-    max-width: 800px;
+    max-width: 850px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
 .prediction-form {
-    background-color: #ffffff;
-    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .form-section {
-    margin-bottom: 1rem;
+    margin-bottom: 1.8rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .form-section h3 {
-    color: #F5A7A6;
+    color: var(--color-primary);
     font-size: 1.2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
 }
 
 .form-group {
@@ -188,112 +198,111 @@
 
 .form-group label {
     font-size: 0.9rem;
-    color: #333;
-    margin-bottom: 0.3rem;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+}
+
+.info-btn {
+    color: var(--color-primary-light);
+    cursor: help;
+    font-size: 0.95rem;
 }
 
 .form-group input,
 .form-group select {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    transition: border-color 0.3s ease;
+    padding: 0.65rem 0.85rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #F5A7A6;
+    border-color: var(--color-primary);
     outline: none;
-}
-
-.submit-btn {
-    display: block;
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #F5A7A6;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.submit-btn:hover {
-    background-color: #E59695;
+    box-shadow: 0 0 0 3px rgba(42, 111, 127, 0.2);
 }
 
 .result-card {
     margin-top: 2rem;
-    padding: 1.5rem;
-    background-color: #ffffff;
+    padding: 2rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
 }
 
-.result-card h3 {
-    color: #F5A7A6;
+.result-danger {
+    border-left: 6px solid #E74C3C;
+}
+
+.result-success {
+    border-left: 6px solid #27AE60;
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.result-card p {
-    margin-bottom: 0.5rem;
+.result-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.result-card ul {
-    list-style: none;
-    padding: 0;
+.result-danger .result-badge {
+    background: rgba(231, 76, 60, 0.15);
+    color: #C0392B;
 }
 
-.result-card li {
-    margin-bottom: 0.3rem;
-    font-size: 0.9rem;
+.result-success .result-badge {
+    background: rgba(39, 174, 96, 0.15);
+    color: #27AE60;
 }
 
-/* Info Button and Tooltip Styles */
-.info-btn {
-    position: relative;
-    display: inline-block;
-    margin-left: 0.3rem;
-    color: #F5A7A6;
-    font-size: 0.8rem;
-    cursor: help;
+.result-interpretation {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
-.info-btn:hover .tooltip {
-    visibility: visible;
-    opacity: 1;
+.params-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
 }
 
-.tooltip {
-    visibility: hidden;
-    opacity: 0;
-    position: absolute;
-    top: -0.5rem;
-    left: 1.5rem;
-    transform: translateY(-100%);
-    background-color: #333;
-    color: #fff;
-    padding: 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    width: 200px;
-    z-index: 1;
-    transition: opacity 0.3s ease;
+.param-item {
+    background: var(--bg-tertiary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
 }
 
-.tooltip::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    transform: translateY(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent #333 transparent transparent;
+.param-key {
+    color: var(--text-secondary);
+}
+
+.param-val {
+    font-weight: 600;
+    color: var(--text-primary);
 }
 </style>
 {% endblock %}

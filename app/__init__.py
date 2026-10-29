@@ -1,5 +1,4 @@
-"""Flask application factory for LUNARA-AI."""
-
+import secrets
 from datetime import timedelta
 
 from flask import Flask, render_template, request, session
@@ -45,12 +44,47 @@ def create_app(config_class=None) -> Flask:
     return app
 
 
+def get_or_create_csrf_token() -> str:
+    """Generate or retrieve CSRF token for the session."""
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_hex(32)
+    return session["csrf_token"]
+
+
 def _register_middleware(app: Flask) -> None:
+    @app.context_processor
+    def inject_template_globals():
+        return {
+            "csrf_token": get_or_create_csrf_token,
+            "is_authenticated": "user_id" in session,
+            "current_username": session.get("username"),
+            "is_admin": bool(session.get("is_admin", False)),
+        }
+
     @app.before_request
     def before_request():
         session.permanent = True
         app.permanent_session_lifetime = timedelta(hours=24)
         session.modified = True
+        get_or_create_csrf_token()
+
+        # Validate CSRF token on mutating requests
+        if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+            if not app.config.get("TESTING", False):
+                # Allow theme API if it uses JSON
+                if not request.path.startswith("/api/"):
+                    token = request.form.get("csrf_token") or request.headers.get("X-CSRFToken")
+                    expected = session.get("csrf_token")
+                    if not token or not secrets.compare_digest(token, expected or ""):
+                        app.logger.warning("CSRF validation failed on %s from %s", request.path, request.remote_addr)
+                        return (
+                            render_template(
+                                "error.html",
+                                error_code=400,
+                                message="Session validation failed (CSRF token mismatch). Please refresh the page and try again.",
+                            ),
+                            400,
+                        )
 
     @app.after_request
     def set_security_headers(response):
@@ -73,6 +107,10 @@ def _register_middleware(app: Flask) -> None:
 
 
 def _register_error_handlers(app: Flask) -> None:
+    @app.errorhandler(400)
+    def bad_request(error):
+        return render_template("error.html", error_code=400, message="Bad Request"), 400
+
     @app.errorhandler(404)
     def not_found(error):
         return render_template("error.html", error_code=404, message="Page not found"), 404

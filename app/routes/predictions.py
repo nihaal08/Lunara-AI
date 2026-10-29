@@ -31,15 +31,27 @@ def predict_gdm():
                 "Prediabetes": int(request.form.get("prediabetes", 0)),
             }
 
-            if not (18 <= inputs["Age"] <= 60):
-                flash("Age must be between 18 and 60.", "error")
-                return render_template("predict_gdm.html")
+            if not (15 <= inputs["Age"] <= 65):
+                flash("Age must be between 15 and 65 years.", "error")
+                return render_template("predict_gdm.html", inputs=inputs, result=None)
             if not (0 <= inputs["No of Pregnancy"] <= 15):
                 flash("Number of pregnancies must be between 0 and 15.", "error")
-                return render_template("predict_gdm.html")
-            if not (15 <= inputs["BMI"] <= 55):
-                flash("BMI must be between 15 and 55.", "error")
-                return render_template("predict_gdm.html")
+                return render_template("predict_gdm.html", inputs=inputs, result=None)
+            if not (15 <= inputs["BMI"] <= 60):
+                flash("BMI must be between 15 and 60.", "error")
+                return render_template("predict_gdm.html", inputs=inputs, result=None)
+            if not (15 <= inputs["HDL"] <= 120):
+                flash("HDL cholesterol must be between 15 and 120 mg/dL.", "error")
+                return render_template("predict_gdm.html", inputs=inputs, result=None)
+            if not (70 <= inputs["Sys_BP"] <= 220):
+                flash("Systolic BP must be between 70 and 220 mmHg.", "error")
+                return render_template("predict_gdm.html", inputs=inputs, result=None)
+            if not (40 <= inputs["Dia_BP"] <= 130):
+                flash("Diastolic BP must be between 40 and 130 mmHg.", "error")
+                return render_template("predict_gdm.html", inputs=inputs, result=None)
+            if not (40 <= inputs["OGTT"] <= 350):
+                flash("OGTT must be between 40 and 350 mg/dL.", "error")
+                return render_template("predict_gdm.html", inputs=inputs, result=None)
 
             result = current_app.model_predictor.predict_gdm(pd.DataFrame([inputs]))
             current_app.prediction_service.save(
@@ -50,7 +62,7 @@ def predict_gdm():
             )
             flash("Prediction completed successfully!", "success")
         except ValueError:
-            flash("Invalid input. Please check your values.", "error")
+            flash("Invalid input. Please check numeric values.", "error")
         except Exception as exc:
             current_app.logger.exception("GDM prediction error")
             flash(f"Error during prediction: {exc}", "error")
@@ -74,9 +86,21 @@ def predict_maternal():
                 "HeartRate": int(request.form.get("heart_rate", 0)),
             }
 
-            if not (15 <= inputs["Age"] <= 60):
-                flash("Age must be between 15 and 60.", "error")
-                return render_template("predict_maternal.html")
+            if not (10 <= inputs["Age"] <= 70):
+                flash("Age must be between 10 and 70 years.", "error")
+                return render_template("predict_maternal.html", inputs=inputs, result=None)
+            if not (60 <= inputs["SystolicBP"] <= 220):
+                flash("Systolic BP must be between 60 and 220 mmHg.", "error")
+                return render_template("predict_maternal.html", inputs=inputs, result=None)
+            if not (40 <= inputs["DiastolicBP"] <= 130):
+                flash("Diastolic BP must be between 40 and 130 mmHg.", "error")
+                return render_template("predict_maternal.html", inputs=inputs, result=None)
+            if not (2.0 <= inputs["BS"] <= 30.0):
+                flash("Blood sugar must be between 2.0 and 30.0 mmol/L.", "error")
+                return render_template("predict_maternal.html", inputs=inputs, result=None)
+            if not (40 <= inputs["HeartRate"] <= 180):
+                flash("Heart rate must be between 40 and 180 bpm.", "error")
+                return render_template("predict_maternal.html", inputs=inputs, result=None)
 
             result = current_app.model_predictor.predict_maternal(pd.DataFrame([inputs]))
             current_app.prediction_service.save(
@@ -87,7 +111,7 @@ def predict_maternal():
             )
             flash("Prediction completed successfully!", "success")
         except ValueError:
-            flash("Invalid input. Please check your values.", "error")
+            flash("Invalid input. Please check numeric values.", "error")
         except Exception as exc:
             current_app.logger.exception("Maternal prediction error")
             flash(f"Error during prediction: {exc}", "error")
@@ -120,8 +144,35 @@ def predict_preeclampsia():
             }
 
             if not (15 <= inputs["Age"] <= 60):
-                flash("Age must be between 15 and 60.", "error")
-                return render_template("predict_preeclampsia.html")
+                flash("Age must be between 15 and 60 years.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (0 <= inputs["gravida"] <= 15):
+                flash("Gravida (pregnancies) must be between 0 and 15.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (0 <= inputs["parity"] <= 15):
+                flash("Parity (births) must be between 0 and 15.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (10.0 <= inputs["Gestational_Age_Weeks"] <= 44.0):
+                flash("Gestational age must be between 10 and 44 weeks.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (15.0 <= inputs["BMI"] <= 60.0):
+                flash("BMI must be between 15 and 60.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (60.0 <= inputs["Systolic BP"] <= 220.0):
+                flash("Systolic BP must be between 60 and 220 mmHg.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (40.0 <= inputs["Diastolic BP"] <= 130.0):
+                flash("Diastolic BP must be between 40 and 130 mmHg.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (4.0 <= inputs["HB"] <= 20.0):
+                flash("Hemoglobin must be between 4.0 and 20.0 g/dL.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (0.05 <= inputs["Fetal_Weight"] <= 6.0):
+                flash("Fetal weight must be between 0.05 and 6.0 kg.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
+            if not (2.0 <= inputs["Amniotic_Fluid_Levels"] <= 35.0):
+                flash("Amniotic fluid levels must be between 2.0 and 35.0 cm.", "error")
+                return render_template("predict_preeclampsia.html", inputs=inputs, result=None)
 
             result = current_app.model_predictor.predict_preeclampsia(pd.DataFrame([inputs]))
             current_app.prediction_service.save(
@@ -132,7 +183,7 @@ def predict_preeclampsia():
             )
             flash("Prediction completed successfully!", "success")
         except ValueError:
-            flash("Invalid input. Please check your values.", "error")
+            flash("Invalid input. Please check numeric values.", "error")
         except Exception as exc:
             current_app.logger.exception("Preeclampsia prediction error")
             flash(f"Error during prediction: {exc}", "error")
