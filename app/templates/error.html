@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }} - LUNARA{% endblock %}
+
+{% block hero %}
+<section class="hero" style="background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);">
+    <h1><i class="fas fa-exclamation-triangle"></i> Error {{ error_code }}</h1>
+    <p>{{ message }}</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: var(--spacing-xl) auto; text-align: center;">
+    <div class="card" style="padding: var(--spacing-xl);">
+        <div style="font-size: 4rem; margin-bottom: var(--spacing-lg);">
+            {% if error_code == 404 %}
+                <i class="fas fa-search" style="color: var(--color-accent);"></i>
+            {% elif error_code == 403 %}
+                <i class="fas fa-lock" style="color: #E74C3C;"></i>
+            {% else %}
+                <i class="fas fa-cogs" style="color: #F39C12;"></i>
+            {% endif %}
+        </div>
+        
+        <h2 style="margin-bottom: var(--spacing-md);">
+            {% if error_code == 404 %}
+                Page Not Found
+            {% elif error_code == 403 %}
+                Access Denied
+            {% else %}
+                Something Went Wrong
+            {% endif %}
+        </h2>
+        
+        <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg); font-size: 1.05rem;">
+            {% if error_code == 404 %}
+                The page you're looking for doesn't exist or has been moved. Please check the URL and try again.
+            {% elif error_code == 403 %}
+                You don't have permission to access this resource. If you believe this is an error, please contact support.
+            {% else %}
+                We encountered an unexpected error. Our team has been notified and is working on it. Please try again in a moment.
+            {% endif %}
+        </p>
+        
+        <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('main.home') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="{{ url_for('main.contact') }}" class="btn btn-outline">
+                <i class="fas fa-envelope"></i> Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,583 @@
+"""
+LUNARA-AI: Maternal Healthcare AI Prediction System
+A modern, secure Flask application for maternal health risk prediction
+"""
+
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file, jsonify, make_response
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
+from functools import wraps
+import os
+import json
+import sqlite3
+from fpdf2 import FPDF
+import io
+
+# Import custom modules
+from config import get_config
+from utils import DatabaseManager, ModelPredictor, login_required, admin_required
+
+# Initialize Flask application
+app = Flask(__name__)
+config = get_config()
+app.config.from_object(config)
+
+# Initialize managers
+db_manager = DatabaseManager(app.config['DATABASE_PATH'])
+db_manager.init_db()
+
+models_path = os.path.join(os.path.dirname(__file__), 'models')
+model_predictor = ModelPredictor(models_path)
+
+# ============================================================
+# SECURITY MIDDLEWARE & HEADERS
+# ============================================================
+
+@app.before_request
+def before_request():
+    """Set secure session parameters"""
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(hours=24)
+    session.modified = True
+
+@app.after_request
+def set_security_headers(response):
+    """Add security headers to all responses"""
+    # Prevent caching of sensitive content
+    if not request.path.startswith('/static'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0, private'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    
+    # Security headers
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' fonts.googleapis.com cdnjs.cloudflare.com; font-src 'self' fonts.gstatic.com cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self';"
+    
+    return response
+
+@app.errorhandler(404)
+def not_found(error):
+    """Handle 404 errors"""
+    return render_template('error.html', error_code=404, message='Page not found'), 404
+
+@app.errorhandler(403)
+def forbidden(error):
+    """Handle 403 errors"""
+    return render_template('error.html', error_code=403, message='Access forbidden'), 403
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Handle 500 errors"""
+    return render_template('error.html', error_code=500, message='Internal server error'), 500
+
+# ============================================================
+# PDF REPORT GENERATION
+# ============================================================
+
+class PredictionReportPDF(FPDF):
+    """Custom PDF class for generating prediction reports"""
+    
+    def header(self):
+        self.set_font('Helvetica', 'B', 16)
+        self.cell(0, 10, 'LUNARA Medical Prediction Report', 0, 1, 'C')
+        self.set_font('Helvetica', '', 10)
+        self.cell(0, 5, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', 0, 1, 'C')
+        self.ln(7)
+    
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Helvetica', 'I', 8)
+        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+    
+    def chapter_title(self, title):
+        self.set_font('Helvetica', 'B', 12)
+        self.set_text_color(42, 111, 127)
+        self.cell(0, 10, title, 0, 1)
+        self.set_text_color(0, 0, 0)
+        self.ln(2)
+    
+    def chapter_body(self, body):
+        self.set_font('Helvetica', '', 11)
+        self.multi_cell(0, 5, body)
+        self.ln(3)
+
+def generate_prediction_pdf(predictions):
+    """Generate PDF report from prediction history"""
+    pdf = PredictionReportPDF()
+    pdf.add_page()
+    
+    if predictions:
+        for idx, pred in enumerate(predictions, 1):
+            pdf.chapter_title(f'Prediction {idx} - {pred.get("model_type", "Unknown")}')
+            pdf.chapter_body(f'Prediction Result: {pred.get("prediction", "N/A")}')
+            pdf.chapter_body(f'Date: {pred.get("timestamp", "N/A")}')
+            pdf.chapter_body('Input Parameters:')
+            
+            inputs = pred.get('inputs', {})
+            if isinstance(inputs, str):
+                inputs = json.loads(inputs)
+            
+            for key, value in inputs.items():
+                formatted_key = key.replace('_', ' ').title()
+                pdf.chapter_body(f'  • {formatted_key}: {value}')
+            
+            pdf.ln(5)
+    else:
+        pdf.chapter_body('No prediction history available.')
+    
+    pdf.chapter_title('Important Disclaimer')
+    pdf.chapter_body(
+        'This report is generated by LUNARA, an AI-powered prediction system. '
+        'The predictions are for informational purposes and should not be considered '
+        'as medical advice. Please consult with qualified healthcare professionals '
+        'for diagnosis and treatment decisions.'
+    )
+    
+    pdf_bytes = pdf.output(dest='S')
+    if isinstance(pdf_bytes, str):
+        pdf_bytes = pdf_bytes.encode('latin-1')
+    
+    pdf_buffer = io.BytesIO()
+    pdf_buffer.write(pdf_bytes)
+    pdf_buffer.seek(0)
+    return pdf_buffer
+
+# ============================================================
+# PUBLIC ROUTES
+# ============================================================
+
+@app.route('/', methods=['GET'])
+def index():
+    """Redirect to home page"""
+    return redirect(url_for('home'))
+
+@app.route('/home', methods=['GET'])
+def home():
+    """Home page route"""
+    is_authenticated = 'user_id' in session
+    username = session.get('username', None)
+    return render_template('home.html', username=username, is_authenticated=is_authenticated)
+
+@app.route('/about', methods=['GET'])
+def about():
+    """About page route"""
+    return render_template('about.html')
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    """Contact page route"""
+    if request.method == 'POST':
+        flash('Thank you for your message. We will get back to you soon!', 'success')
+        return redirect(url_for('contact'))
+    return render_template('contact.html')
+
+# ============================================================
+# AUTHENTICATION ROUTES
+# ============================================================
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """User login route"""
+    if 'user_id' in session:
+        return redirect(url_for('home'))
+    
+    if request.method == 'POST':
+        identifier = request.form.get('identifier', '').strip()
+        password = request.form.get('password', '')
+        
+        if not identifier or not password:
+            flash('Please provide both username/email and password.', 'error')
+            return render_template('login.html')
+        
+        try:
+            conn = db_manager.get_connection()
+            c = conn.cursor()
+            c.execute(
+                "SELECT id, username, email, password, is_admin FROM users WHERE (username = ? OR email = ?) AND is_active = 1",
+                (identifier, identifier)
+            )
+            user = c.fetchone()
+            conn.close()
+            
+            if user and check_password_hash(user[3], password):
+                session['user_id'] = user[0]
+                session['username'] = user[1]
+                session['email'] = user[2]
+                session['is_admin'] = bool(user[4])
+                
+                # Update last login
+                conn = db_manager.get_connection()
+                c = conn.cursor()
+                c.execute("UPDATE users SET last_login = ? WHERE id = ?", 
+                         (datetime.now().isoformat(), user[0]))
+                conn.commit()
+                conn.close()
+                
+                flash(f'Welcome back, {user[1]}!', 'success')
+                return redirect(url_for('home'))
+            else:
+                flash('Invalid username/email or password.', 'error')
+        except Exception as e:
+            flash('An error occurred during login. Please try again.', 'error')
+    
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    """User registration route"""
+    if 'user_id' in session:
+        return redirect(url_for('home'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        full_name = request.form.get('full_name', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        
+        # Validation
+        if not all([username, full_name, email, password, confirm_password]):
+            flash('All fields are required.', 'error')
+            return render_template('signup.html')
+        
+        if len(username) < 3:
+            flash('Username must be at least 3 characters long.', 'error')
+            return render_template('signup.html')
+        
+        if len(password) < 6:
+            flash('Password must be at least 6 characters long.', 'error')
+            return render_template('signup.html')
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'error')
+            return render_template('signup.html')
+        
+        try:
+            conn = db_manager.get_connection()
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO users (username, full_name, email, password, is_admin, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (username, full_name, email, generate_password_hash(password), 0, datetime.now().isoformat())
+            )
+            conn.commit()
+            conn.close()
+            
+            flash('Account created successfully! Please log in.', 'success')
+            return redirect(url_for('login'))
+        except sqlite3.IntegrityError:
+            flash('Username or email already exists.', 'error')
+        except Exception as e:
+            flash('An error occurred during registration.', 'error')
+    
+    return render_template('signup.html')
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    """User logout route"""
+    session.clear()
+    flash('You have been logged out successfully.', 'success')
+    return redirect(url_for('home'))
+
+# ============================================================
+# PREDICTION ROUTES
+# ============================================================
+
+@app.route('/predict/gdm', methods=['GET', 'POST'])
+@login_required
+def predict_gdm():
+    """Gestational Diabetes Mellitus prediction"""
+    result = None
+    inputs = None
+    
+    if request.method == 'POST':
+        try:
+            # Input validation
+            inputs = {
+                'Age': float(request.form.get('age', 0)),
+                'No of Pregnancy': int(request.form.get('no_pregnancy', 0)),
+                'BMI': float(request.form.get('bmi', 0)),
+                'HDL': float(request.form.get('hdl', 0)),
+                'Family History': int(request.form.get('family_history', 0)),
+                'Large Child': int(request.form.get('large_child', 0)),
+                'PCOS': int(request.form.get('pcos', 0)),
+                'Sys_BP': float(request.form.get('sys_bp', 0)),
+                'Dia_BP': float(request.form.get('dia_bp', 0)),
+                'OGTT': float(request.form.get('ogtt', 0)),
+                'Sedentary Lifestyle': int(request.form.get('sedentary', 0)),
+                'Prediabetes': int(request.form.get('prediabetes', 0))
+            }
+            
+            # Validate ranges
+            if not (18 <= inputs['Age'] <= 60):
+                flash('Age must be between 18 and 60.', 'error')
+                return render_template('predict_gdm.html')
+            if not (0 <= inputs['No of Pregnancy'] <= 15):
+                flash('Number of pregnancies must be between 0 and 15.', 'error')
+                return render_template('predict_gdm.html')
+            if not (15 <= inputs['BMI'] <= 55):
+                flash('BMI must be between 15 and 55.', 'error')
+                return render_template('predict_gdm.html')
+            
+            import pandas as pd
+            input_df = pd.DataFrame([inputs])
+            result = model_predictor.predict_gdm(input_df)
+            
+            # Save prediction
+            conn = db_manager.get_connection()
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO predictions (user_id, model_type, inputs, prediction, timestamp) VALUES (?, ?, ?, ?, ?)",
+                (session['user_id'], 'Gestational Diabetes', json.dumps(inputs), str(result), 
+                 datetime.now().isoformat())
+            )
+            conn.commit()
+            conn.close()
+            
+            flash('Prediction completed successfully!', 'success')
+        except ValueError as e:
+            flash('Invalid input. Please check your values.', 'error')
+        except Exception as e:
+            flash(f'Error during prediction: {str(e)}', 'error')
+    
+    return render_template('predict_gdm.html', result=result, inputs=inputs)
+
+@app.route('/predict/maternal', methods=['GET', 'POST'])
+@login_required
+def predict_maternal():
+    """Maternal Health Risk prediction"""
+    result = None
+    inputs = None
+    
+    if request.method == 'POST':
+        try:
+            inputs = {
+                'Age': float(request.form.get('age', 0)),
+                'SystolicBP': float(request.form.get('systolic_bp', 0)),
+                'DiastolicBP': float(request.form.get('diastolic_bp', 0)),
+                'BS': float(request.form.get('bs', 0)),
+                'HeartRate': int(request.form.get('heart_rate', 0))
+            }
+            
+            # Validate ranges
+            if not (15 <= inputs['Age'] <= 60):
+                flash('Age must be between 15 and 60.', 'error')
+                return render_template('predict_maternal.html')
+            
+            import pandas as pd
+            input_df = pd.DataFrame([inputs])
+            result = model_predictor.predict_maternal(input_df)
+            
+            # Save prediction
+            conn = db_manager.get_connection()
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO predictions (user_id, model_type, inputs, prediction, timestamp) VALUES (?, ?, ?, ?, ?)",
+                (session['user_id'], 'Maternal Health Risk', json.dumps(inputs), str(result),
+                 datetime.now().isoformat())
+            )
+            conn.commit()
+            conn.close()
+            
+            flash('Prediction completed successfully!', 'success')
+        except ValueError:
+            flash('Invalid input. Please check your values.', 'error')
+        except Exception as e:
+            flash(f'Error during prediction: {str(e)}', 'error')
+    
+    return render_template('predict_maternal.html', result=result, inputs=inputs)
+
+@app.route('/predict/preeclampsia', methods=['GET', 'POST'])
+@login_required
+def predict_preeclampsia():
+    """Preeclampsia Risk prediction"""
+    result = None
+    inputs = None
+    
+    if request.method == 'POST':
+        try:
+            inputs = {
+                'Age': float(request.form.get('age', 0)),
+                'Systolic BP': float(request.form.get('systolic_bp', 0)),
+                'Diastolic BP': float(request.form.get('diastolic_bp', 0)),
+                'BMI': float(request.form.get('bmi', 0)),
+                'HeartRate': int(request.form.get('heart_rate', 0))
+            }
+            
+            # Validate ranges
+            if not (15 <= inputs['Age'] <= 60):
+                flash('Age must be between 15 and 60.', 'error')
+                return render_template('predict_preeclampsia.html')
+            
+            import pandas as pd
+            input_df = pd.DataFrame([inputs])
+            result = model_predictor.predict_preeclampsia(input_df)
+            
+            # Save prediction
+            conn = db_manager.get_connection()
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO predictions (user_id, model_type, inputs, prediction, timestamp) VALUES (?, ?, ?, ?, ?)",
+                (session['user_id'], 'Preeclampsia Risk', json.dumps(inputs), str(result),
+                 datetime.now().isoformat())
+            )
+            conn.commit()
+            conn.close()
+            
+            flash('Prediction completed successfully!', 'success')
+        except ValueError:
+            flash('Invalid input. Please check your values.', 'error')
+        except Exception as e:
+            flash(f'Error during prediction: {str(e)}', 'error')
+    
+    return render_template('predict_preeclampsia.html', result=result, inputs=inputs)
+
+# ============================================================
+# USER DASHBOARD ROUTES
+# ============================================================
+
+@app.route('/history', methods=['GET'])
+@login_required
+def history():
+    """View prediction history"""
+    try:
+        conn = db_manager.get_connection()
+        c = conn.cursor()
+        c.execute(
+            "SELECT id, model_type, inputs, prediction, timestamp FROM predictions WHERE user_id = ? ORDER BY timestamp DESC",
+            (session['user_id'],)
+        )
+        raw_predictions = c.fetchall()
+        conn.close()
+        
+        predictions = []
+        for pred in raw_predictions:
+            try:
+                inputs = json.loads(pred[2]) if isinstance(pred[2], str) else pred[2]
+            except:
+                inputs = {}
+            
+            predictions.append({
+                'id': pred[0],
+                'model_type': pred[1],
+                'inputs': inputs,
+                'prediction': pred[3],
+                'timestamp': pred[4]
+            })
+        
+        return render_template('history.html', predictions=predictions)
+    except Exception as e:
+        flash('Error loading prediction history.', 'error')
+        return redirect(url_for('home'))
+
+@app.route('/download-history', methods=['POST'])
+@login_required
+def download_history():
+    """Download prediction history as PDF"""
+    try:
+        conn = db_manager.get_connection()
+        c = conn.cursor()
+        c.execute(
+            "SELECT model_type, inputs, prediction, timestamp FROM predictions WHERE user_id = ? ORDER BY timestamp DESC",
+            (session['user_id'],)
+        )
+        raw_predictions = c.fetchall()
+        conn.close()
+        
+        predictions = []
+        for pred in raw_predictions:
+            try:
+                inputs = json.loads(pred[1]) if isinstance(pred[1], str) else pred[1]
+            except:
+                inputs = {}
+            
+            predictions.append({
+                'model_type': pred[0],
+                'inputs': inputs,
+                'prediction': pred[2],
+                'timestamp': pred[3]
+            })
+        
+        pdf_buffer = generate_prediction_pdf(predictions)
+        response = make_response(send_file(
+            pdf_buffer,
+            as_attachment=True,
+            download_name=f'LUNARA_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf',
+            mimetype='application/pdf'
+        ))
+        return response
+    except Exception as e:
+        flash('Error generating PDF report.', 'error')
+        return redirect(url_for('history'))
+
+@app.route('/clear-history', methods=['POST'])
+@login_required
+def clear_history():
+    """Clear prediction history"""
+    try:
+        conn = db_manager.get_connection()
+        c = conn.cursor()
+        c.execute("DELETE FROM predictions WHERE user_id = ?", (session['user_id'],))
+        conn.commit()
+        conn.close()
+        flash('Prediction history cleared successfully.', 'success')
+    except Exception as e:
+        flash('Error clearing history.', 'error')
+    
+    return redirect(url_for('history'))
+
+# ============================================================
+# ADMIN ROUTES
+# ============================================================
+
+@app.route('/admin/dashboard', methods=['GET'])
+@admin_required
+def admin_dashboard():
+    """Admin dashboard"""
+    try:
+        conn = db_manager.get_connection()
+        c = conn.cursor()
+        
+        # Get statistics
+        c.execute("SELECT COUNT(*) FROM users")
+        total_users = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM predictions")
+        total_predictions = c.fetchone()[0]
+        c.execute("SELECT COUNT(DISTINCT user_id) FROM predictions")
+        active_users = c.fetchone()[0]
+        
+        conn.close()
+        
+        stats = {
+            'total_users': total_users,
+            'total_predictions': total_predictions,
+            'active_users': active_users
+        }
+        
+        return render_template('admin.html', stats=stats)
+    except Exception as e:
+        flash('Error loading admin dashboard.', 'error')
+        return redirect(url_for('home'))
+
+# ============================================================
+# API ENDPOINTS
+# ============================================================
+
+@app.route('/api/theme', methods=['POST'])
+def set_theme():
+    """API endpoint to set user theme preference"""
+    data = request.get_json()
+    theme = data.get('theme', 'light')
+    
+    response = jsonify({'status': 'success', 'theme': theme})
+    response.set_cookie('theme', theme, max_age=30*24*60*60)  # 30 days
+    return response
+
+# ============================================================
+# RUN APPLICATION
+# ============================================================
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)

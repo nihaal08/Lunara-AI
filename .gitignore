@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.env.local
+
+# Database & logs
+instance/
+*.db
+*.log
+
+# ML artifacts (train locally)
+ml/*/artifacts/*.pkl
+Back-End/**/*.pkl
+Front-End/models/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Legacy folders (optional - remove after migration)
+# Front-End/database.db

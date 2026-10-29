@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}Login - LUNARA Maternal Healthcare{% endblock %}
+
+{% block hero %}
+<section class="hero">
+    <h1><i class="fas fa-sign-in-alt"></i> Welcome Back</h1>
+    <p>Log in to access your personalized maternal health predictions and assessments</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2><i class="fas fa-lock"></i> Login to Your Account</h2>
+            <p>Secure access to your health data</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}" novalidate>
+            <div class="form-group">
+                <label for="identifier">
+                    <i class="fas fa-user"></i> Username or Email
+                </label>
+                <input type="text" id="identifier" name="identifier" 
+                    placeholder="Enter your username or email" 
+                    required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-key"></i> Password
+                </label>
+                <input type="password" id="password" name="password" 
+                    placeholder="Enter your password" 
+                    required autocomplete="current-password">
+            </div>
+
+            <div class="form-checkbox">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Remember me</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">
+                <i class="fas fa-arrow-right"></i> Login Now
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? 
+                <a href="{{ url_for('signup') }}" class="auth-link">
+                    <strong>Create one here</strong>
+                </a>
+            </p>
+            <p style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <a href="{{ url_for('home') }}" class="auth-link" style="color: var(--text-secondary);">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-info">
+        <h3><i class="fas fa-shield-alt"></i> Your Privacy Matters</h3>
+        <ul>
+            <li><i class="fas fa-check"></i> Military-grade encryption</li>
+            <li><i class="fas fa-check"></i> Secure server infrastructure</li>
+            <li><i class="fas fa-check"></i> HIPAA compliant</li>
+            <li><i class="fas fa-check"></i> No data sharing</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+.auth-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    max-width: 1000px;
+    margin: var(--spacing-xl) auto;
+    align-items: center;
+}
+
+.auth-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-header {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.auth-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.auth-header p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.form-checkbox input {
+    width: auto;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    font-size: 0.95rem;
+}
+
+.auth-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+    color: var(--color-primary-light);
+    text-decoration: underline;
+}
+
+.auth-info {
+    background-color: var(--bg-secondary);
+    border-left: 4px solid var(--color-primary);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+}
+
+.auth-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.auth-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.auth-info li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+}
+
+.auth-info i {
+    color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .auth-card {
+        padding: var(--spacing-lg);
+    }
+}
+</style>
+{% endblock %}
+
+<style>
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 400px;
+    margin: 2rem auto;
+    min-height: calc(100vh - 300px - 6rem); /* Adjust for hero and padding */
+}
+
+.card {
+    width: 100%;
+    max-width: 400px;
+    padding: 1.5rem;
+    background-color: #F7F7FA;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+    color: #2A6F7F;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-group {
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #333333;
+    margin-bottom: 0.2rem;
+}
+
+.form-group input {
+    padding: 0.4rem;
+    border: 1px solid #D3D8DB;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #2A6F7F;
+    outline: none;
+}
+
+.form-group input:invalid {
+    border-color: #D9534F; /* Red for invalid input */
+}
+
+button {
+    background-color: #2A6F7F;
+    color: #FFFFFF;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #3B8A9B;
+}
+
+.form-footer {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.form-footer a {
+    color: #2A6F7F;
+    text-decoration: none;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #D9534F;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const identifierInput = document.getElementById('identifier');
+    const passwordInput = document.getElementById('password');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Reset any previous error messages
+        clearErrors();
+        
+        let isValid = true;
+        
+        // Validate username/email
+        const identifier = identifierInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!identifier) {
+            showError(identifierInput, 'Username or email is required');
+            isValid = false;
+        } else if (!emailRegex.test(identifier) && identifier.length < 3) {
+            showError(identifierInput, 'Please enter a valid email or username (minimum 3 characters)');
+            isValid = false;
+        }
+        
+        // Validate password
+        const password = passwordInput.value;
+        if (!password) {
+            showError(passwordInput, 'Password is required');
+            isValid = false;
+        } else if (password.length < 8) {
+            showError(passwordInput, 'Password must be at least 8 characters long');
+            isValid = false;
+        }
+        
+        // If all validations pass, submit the form
+        if (isValid) {
+            form.submit();
+        }
+    });
+    
+    // Helper function to show error messages
+    function showError(input, message) {
+        const formGroup = input.parentElement;
+        const error = document.createElement('div');
+        error.className = 'error-message';
+        error.textContent = message;
+        formGroup.appendChild(error);
+    }
+    
+    // Helper function to clear error messages
+    function clearErrors() {
+        const errors = document.querySelectorAll('.error-message');
+        errors.forEach(error => error.remove());
+    }
+});
+</script>
+{% endblock %}

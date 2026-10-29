@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Login - LUNARA Maternal Healthcare{% endblock %}
+
+{% block hero %}
+<section class="hero">
+    <h1><i class="fas fa-sign-in-alt"></i> Welcome Back</h1>
+    <p>Log in to access your personalized maternal health predictions and assessments</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2><i class="fas fa-lock"></i> Login to Your Account</h2>
+            <p>Secure access to your health data</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+            <div class="form-group">
+                <label for="identifier">
+                    <i class="fas fa-user"></i> Username or Email
+                </label>
+                <input type="text" id="identifier" name="identifier" 
+                    placeholder="Enter your username or email" 
+                    required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-key"></i> Password
+                </label>
+                <input type="password" id="password" name="password" 
+                    placeholder="Enter your password" 
+                    required autocomplete="current-password">
+            </div>
+
+            <div class="form-checkbox">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Remember me</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">
+                <i class="fas fa-arrow-right"></i> Login Now
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? 
+                <a href="{{ url_for('auth.signup') }}" class="auth-link">
+                    <strong>Create one here</strong>
+                </a>
+            </p>
+            <p style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <a href="{{ url_for('main.home') }}" class="auth-link" style="color: var(--text-secondary);">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-info">
+        <h3><i class="fas fa-shield-alt"></i> Your Privacy Matters</h3>
+        <ul>
+            <li><i class="fas fa-check"></i> Military-grade encryption</li>
+            <li><i class="fas fa-check"></i> Secure server infrastructure</li>
+            <li><i class="fas fa-check"></i> HIPAA compliant</li>
+            <li><i class="fas fa-check"></i> No data sharing</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+.auth-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    max-width: 1000px;
+    margin: var(--spacing-xl) auto;
+    align-items: center;
+}
+
+.auth-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-header {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.auth-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.auth-header p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.form-checkbox input {
+    width: auto;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    font-size: 0.95rem;
+}
+
+.auth-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+    color: var(--color-primary-light);
+    text-decoration: underline;
+}
+
+.auth-info {
+    background-color: var(--bg-secondary);
+    border-left: 4px solid var(--color-primary);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+}
+
+.auth-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.auth-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.auth-info li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+}
+
+.auth-info i {
+    color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .auth-card {
+        padding: var(--spacing-lg);
+    }
+}
+</style>
+{% endblock %}

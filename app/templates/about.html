@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}About LUNARA - Maternal Healthcare AI{% endblock %}
+
+{% block hero %}
+<section class="hero">
+    <h1><i class="fas fa-info-circle"></i> About LUNARA</h1>
+    <p>Revolutionizing maternal healthcare through artificial intelligence and compassionate care</p>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Mission & Vision -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+    <div class="card">
+        <h3 style="display: flex; align-items: center; gap: var(--spacing-sm); color: var(--color-primary); margin-bottom: var(--spacing-md);">
+            <i class="fas fa-bullseye" style="font-size: 1.5rem;"></i> Our Mission
+        </h3>
+        <p style="line-height: 1.8;">
+            LUNARA is dedicated to empowering expectant mothers by providing AI-driven health predictions for a safer, healthier pregnancy journey. We aim to bridge the gap between cutting-edge technology and quality healthcare, ensuring every mother has access to intelligent insights needed for optimal maternal health.
+        </p>
+    </div>
+    
+    <div class="card">
+        <h3 style="display: flex; align-items: center; gap: var(--spacing-sm); color: var(--color-primary); margin-bottom: var(--spacing-md);">
+            <i class="fas fa-eye" style="font-size: 1.5rem;"></i> Our Vision
+        </h3>
+        <p style="line-height: 1.8;">
+            We envision a world where maternal health risks are minimized through early detection, personalized assessments, and accessible technology. Our vision is to create a global community where every expectant mother has the confidence and knowledge to make informed decisions about her health.
+        </p>
+    </div>
+</div>
+
+<!-- Core Values -->
+<section style="margin-bottom: var(--spacing-xl);">
+    <div style="text-align: center; margin-bottom: var(--spacing-lg);">
+        <h2 style="display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
+            <i class="fas fa-heart" style="color: #E74C3C;"></i> Our Core Values
+        </h2>
+        <p style="color: var(--text-secondary);">The principles that guide everything we do</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg);">
+        <div class="card" style="text-align: center;">
+            <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--color-primary); margin-bottom: var(--spacing-sm);"></i>
+            <h4>Security</h4>
+            <p style="font-size: 0.9rem;">Your health data is protected with military-grade encryption and strict privacy protocols.</p>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <i class="fas fa-lightbulb" style="font-size: 2rem; color: var(--color-primary); margin-bottom: var(--spacing-sm);"></i>
+            <h4>Innovation</h4>
+            <p style="font-size: 0.9rem;">We continuously advance our AI models using the latest medical research and data science.</p>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <i class="fas fa-hand-holding-heart" style="font-size: 2rem; color: var(--color-primary); margin-bottom: var(--spacing-sm);"></i>
+            <h4>Compassion</h4>
+            <p style="font-size: 0.9rem;">We approach every interaction with empathy and dedication to maternal health excellence.</p>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <i class="fas fa-globe" style="font-size: 2rem; color: var(--color-primary); margin-bottom: var(--spacing-sm);"></i>
+            <h4>Accessibility</h4>
+            <p style="font-size: 0.9rem;">We make advanced healthcare technology available and easy to use for everyone, everywhere.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Technology Section -->
+<section style="background-color: var(--bg-secondary); border-radius: 12px; padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+    <div style="text-align: center; margin-bottom: var(--spacing-lg);">
+        <h2 style="display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
+            <i class="fas fa-brain"></i> Our Technology
+        </h2>
+        <p style="color: var(--text-secondary);">Advanced AI models trained on comprehensive medical data</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+        <div>
+            <h4 style="margin-bottom: var(--spacing-sm);">Machine Learning Models</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>Trained on 100,000+ patient records</span>
+                </li>
+                <li style="margin-bottom: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>98%+ prediction accuracy rates</span>
+                </li>
+                <li style="margin-bottom: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>Regularly updated with latest research</span>
+                </li>
+                <li style="display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>Peer-reviewed and clinically validated</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div>
+            <h4 style="margin-bottom: var(--spacing-sm);">Security & Compliance</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>HIPAA compliant infrastructure</span>
+                </li>
+                <li style="margin-bottom: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>End-to-end encryption (TLS+AES)</span>
+                </li>
+                <li style="margin-bottom: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>ISO 27001 certified</span>
+                </li>
+                <li style="display: flex; gap: var(--spacing-sm);">
+                    <i class="fas fa-check" style="color: var(--color-primary);"></i>
+                    <span>Zero-knowledge privacy model</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section style="text-align: center;">
+    <h2 style="display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg);">
+        <i class="fas fa-users"></i> Our Team
+    </h2>
+    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto var(--spacing-lg);">
+        A dedicated team of medical doctors, data scientists, and healthcare professionals working together to revolutionize maternal health care through technology.
+    </p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-xl);">
+        <div class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <i class="fas fa-user-md" style="font-size: 3rem; margin-bottom: var(--spacing-sm); color: var(--color-primary);"></i>
+            <h4>Medical Experts</h4>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Experienced OB/GYN specialists and maternal health physicians</p>
+        </div>
+        
+        <div class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <i class="fas fa-microchip" style="font-size: 3rem; margin-bottom: var(--spacing-sm); color: var(--color-primary);"></i>
+            <h4>AI Engineers</h4>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Expert machine learning scientists and data engineers</p>
+        </div>
+        
+        <div class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <i class="fas fa-handshake" style="font-size: 3rem; margin-bottom: var(--spacing-sm); color: var(--color-primary);"></i>
+            <h4>Support Team</h4>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Dedicated customer support and medical advisors</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); color: white; border-radius: 12px; padding: var(--spacing-xl); text-align: center; margin-top: var(--spacing-xl);">
+    <h2 style="margin-bottom: var(--spacing-sm);">Ready to Join Our Mission?</h2>
+    <p style="opacity: 0.95; margin-bottom: var(--spacing-lg); max-width: 600px; margin-left: auto; margin-right: auto;">
+        Take the first step towards empowering your maternal health with LUNARA's advanced AI-driven predictions.
+    </p>
+    <a href="{{ url_for('auth.signup') }}" class="btn btn-outline" style="border-color: white; color: white; padding: 14px 32px;">
+        <i class="fas fa-rocket"></i> Get Started Today
+    </a>
+</section>
+{% endblock %}
